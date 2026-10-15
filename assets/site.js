@@ -6,8 +6,7 @@
 
   /* ---- intro: the magpie lands, then the page starts ---- */
   var intro = document.getElementById('intro');
-  var seen = false;
-  try { seen = sessionStorage.getItem('40ka-intro') === '1'; } catch (e) {}
+  var seen = false; /* intro plays on every load */
   function start() {
     body.classList.remove('intro-wait');
     body.classList.add('bird-ready');
@@ -31,7 +30,6 @@
       body.classList.add('arrived');        /* the bird already landed in the intro: sit her on the hero branch at once */
       body.classList.add('intro-done');
       start();
-      try { sessionStorage.setItem('40ka-intro', '1'); } catch (e) {}
       setTimeout(function () { intro.remove(); }, 800);
     }
     intro.addEventListener('click', finish);
