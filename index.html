@@ -7,7 +7,7 @@
 <meta name="description" content="40ka — студия брендинга. Стратегия и айдентика для бизнеса, который выходит на следующий уровень. Москва, Дубай, Эр-Рияд.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400&family=Golos+Text:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Onest:wght@400;500&display=swap">
 <link rel="stylesheet" href="assets/site.css">
 
 </head>
@@ -76,7 +76,9 @@
 <div class="cursor" aria-hidden="true"></div>
 
 <header class="bar wrap" id="bar">
-  <a class="mark" href="#top"><svg class="mark__bird"  viewBox="0 0 477.5 214.6" aria-hidden="true">
+  <a class="mark" href="#top" aria-label="40ka — на главную">
+    <span class="mark__text">40ka</span>
+    <svg class="mark__bird"  viewBox="0 0 477.5 214.6" aria-hidden="true">
   <defs><clipPath id="mpclip-nav"><path d="M59.5,36.1c16-11,32-19,50-22,34-5,60,10,78,32,29.9,8.8,62.8,12.9,92.1,17.9,29.3,5,15.3,4,22.1,7.9l-30.2,30.2c-10,24-40,44-75,48-39,4-69-14-82-44-8-20-23-40-38-56l-17-14h0Z"/></clipPath></defs>
   <path class="mp-branch" d="M1.5,213.1c100-12,240-8,410-18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
   <g class="mp-bird">
@@ -92,15 +94,28 @@
     <circle class="mp-pupil" cx="102.5" cy="34.1" r="2" fill="currentColor"/>
     <path class="mp-legs" d="M217.5,206.1l-14-5.9M203.5,200.2l-10,7.9M177.5,210.1l-10-7.9M167.5,202.2l-14,5.9M203.5,200.2l-3.8-45-.3-3.6M167.5,202.2l5.5-47,.5-4.2" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
   </g>
-</svg>40ka</a>
+</svg>
+  </a>
   <nav aria-label="Разделы">
     <a href="#works">Работы</a>
     <a href="#services">Услуги</a>
     <a href="#about">О студии</a>
     <a href="#contact">Контакт</a>
   </nav>
-  <div class="lang"><b>RU</b><span>EN</span></div>
+  <div class="bar__right">
+    <div class="lang"><b>RU</b><span>EN</span></div>
+    <button class="burger" type="button" aria-label="Меню" aria-expanded="false" data-menu><i></i><i></i></button>
+  </div>
 </header>
+<div class="menu" id="menu" aria-hidden="true">
+  <nav class="menu__links" aria-label="Меню">
+    <a href="#works">Работы</a>
+    <a href="#services">Услуги</a>
+    <a href="#about">О студии</a>
+    <a href="#contact">Контакт</a>
+  </nav>
+  <div class="menu__foot"><span>Москва — Дубай — Эр-Рияд</span><span>hello@40ka.studio</span></div>
+</div>
 
 <main id="top">
   <section class="hero wrap">

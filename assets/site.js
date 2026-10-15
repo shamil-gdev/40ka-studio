@@ -38,7 +38,7 @@
 
   /* ---- cursor ---- */
   var cur = document.querySelector('.cursor');
-  if (cur && window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reduce) {
+  if (cur && window.matchMedia('(hover: hover) and (pointer: fine)').matches && !(navigator.maxTouchPoints > 0) && !reduce) {
     var cx = 0, cy = 0, tx = 0, ty = 0, raf;
     document.addEventListener('mousemove', function (e) {
       tx = e.clientX; ty = e.clientY;
@@ -99,6 +99,7 @@
   var lastY = window.scrollY, ticking = false;
   function onScroll() {
     var y = window.scrollY, vh = window.innerHeight;
+    body.classList.toggle('scrolled', y > 260);
     if (bar) {
       if (y > 120 && y > lastY + 4) bar.classList.add('hide');
       else if (y < lastY - 4) bar.classList.remove('hide');
@@ -178,6 +179,21 @@
         el.style.transform = 'translateY(var(--drift, 0px))';
       });
     });
+  }
+
+  /* ---- mobile menu ---- */
+  var burger = document.querySelector('[data-menu]');
+  var menu = document.getElementById('menu');
+  if (burger && menu) {
+    function setMenu(open) {
+      body.classList.toggle('menu-open', open);
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      menu.setAttribute('aria-hidden', open ? 'false' : 'true');
+      if (open && bar) bar.classList.remove('hide');
+    }
+    burger.addEventListener('click', function () { setMenu(!body.classList.contains('menu-open')); });
+    menu.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { setMenu(false); }); });
+    window.addEventListener('resize', function () { if (window.innerWidth > 760) setMenu(false); });
   }
 
   /* ---- copy email ---- */
