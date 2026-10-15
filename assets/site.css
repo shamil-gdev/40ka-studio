@@ -443,16 +443,27 @@ body.intro-wait .shelf a { animation-play-state: paused; }
 @media (max-width: 760px) { .service { grid-template-columns: 1fr; } }
 
 /* ---------- process ---------- */
-.steps { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; counter-reset: step; padding-top: 1px; }
+.steps { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 32px; counter-reset: step; padding-top: 1px; }
 .steps__line { position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--line); }
 .steps__line i { display: block; height: 100%; width: calc(var(--p, 0) * 100%); background: var(--ink); transition: width .25s linear; }
-.step { padding-top: 18px; }
-.step::before { counter-increment: step; content: counter(step, decimal-leading-zero); font-family: var(--font-display); font-weight: 300; font-size: 14px; color: var(--ink-soft); display: block; margin-bottom: 36px; }
-.step h3 { font-size: 19px; font-weight: 500; letter-spacing: -.01em; }
-.step p { margin-top: 10px; font-size: 15px; color: var(--ink-soft); }
-.step .dur { margin-top: 18px; font-size: 13px; color: var(--ink-soft); }
-@media (max-width: 900px) { .steps { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 480px) { .steps { grid-template-columns: 1fr; } }
+.step {
+  display: grid; grid-template-columns: auto 1fr; grid-template-areas: "num head" "num text" "num dur";
+  column-gap: 14px; row-gap: 8px; align-items: baseline; padding-top: 22px;
+}
+.step::before {
+  counter-increment: step; content: counter(step, decimal-leading-zero); grid-area: num;
+  font-family: var(--font-display); font-weight: 300; font-size: 13px; color: var(--ink-soft); line-height: 1.6;
+}
+.step h3 { grid-area: head; font-size: 19px; font-weight: 500; letter-spacing: -.01em; line-height: 1.25; }
+.step p { grid-area: text; margin: 0; font-size: 15px; color: var(--ink-soft); }
+.step .dur { grid-area: dur; margin-top: 6px; font-size: 13px; color: var(--ink-soft); }
+@media (max-width: 900px) {
+  .steps { grid-template-columns: 1fr; gap: 0; }
+  .steps__line { display: none; }
+  .step { grid-template-columns: 44px 1fr auto; grid-template-areas: "num head dur" "num text text"; padding-block: 20px; border-top: 1px solid var(--line); column-gap: 10px; }
+  .step:last-child { border-bottom: 1px solid var(--line); }
+  .step .dur { margin: 0; white-space: nowrap; }
+}
 
 /* ---------- about ---------- */
 .about { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
