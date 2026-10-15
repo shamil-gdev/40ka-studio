@@ -196,13 +196,12 @@ body.intro-skip #intro{display:none}
 .bar.hide { transform: translateY(-100%); }
 .mark {
   font-family: var(--font-logo); font-weight: 400; font-size: 27px; letter-spacing: -.02em; line-height: 1;
-  display: grid; align-items: center; height: 40px;
+  display: flex; align-items: center; height: 40px;
 }
-.mark__text, .mark__bird { grid-area: 1 / 1; transition: opacity .45s var(--ease), transform .6s var(--ease); }
-.mark__bird { opacity: 0; transform: translateX(18px); pointer-events: none; }
-body.scrolled .mark__text { opacity: 0; transform: translateX(-12px); }
-body.scrolled .mark__bird { opacity: 1; transform: none; }
-.mark__bird { width: 84px; height: 38px; color: var(--ink); --mp-white: var(--bg); overflow: visible; }
+.mark__text { order: 2; }
+.mark__bird { order: 1; width: 0; margin-right: 0; opacity: 0; transform: translateX(-10px); transition: width .6s var(--ease), margin .6s var(--ease), opacity .4s, transform .6s var(--ease); }
+body.scrolled .mark__bird { width: 84px; margin-right: 12px; opacity: 1; transform: none; }
+.mark__bird { height: 38px; color: var(--ink); --mp-white: var(--bg); overflow: visible; flex: none; }
 .mark__bird .mp-white, .mark__bird .mp-eye { fill: var(--bg); }
 .bar nav { display: flex; gap: 28px; font-size: 15px; }
 .bar nav a { position: relative; padding-block: 4px; }
@@ -296,7 +295,7 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
   margin-top: clamp(16px, 3vw, 40px);
   display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: end;
 }
-.hero__sub p { max-width: 46ch; font-size: clamp(17px, 1.4vw, 21px); line-height: 1.5; }
+.hero__sub p { max-width: 36ch; font-size: clamp(18px, 1.6vw, 24px); line-height: 1.45; }
 .hero__sub .cities { font-size: 15px; color: var(--ink-soft); display: flex; flex-direction: column; gap: 2px; justify-self: end; text-align: right; }
 @media (max-width: 900px) {
   .hero { grid-template-columns: 1fr; grid-template-areas: "text" "bird" "sub"; }
@@ -367,6 +366,15 @@ body.intro-wait .shelf a { animation-play-state: paused; }
 .ticker__track i { width: 6px; height: 6px; background: var(--ink); border-radius: 50%; flex: none; }
 @keyframes ticker { to { transform: translateX(-50%) } }
 .ticker:hover .ticker__track { animation-play-state: paused; }
+
+/* ---------- bands: full-bleed tone changes for rhythm ---------- */
+.band { padding-left: 0; padding-right: 0; }
+.band--dark { --ink: #FFFFFF; --ink-soft: #B9BBB8; --line: #3A3C3B; --bg: #000000; background: #000; color: #fff; border-top: 0; }
+.band--dark + .section { border-top: 0; }
+.band--dark .service:first-of-type { border-top-color: #3A3C3B; }
+.interlude { height: clamp(320px, 62vh, 720px); overflow: hidden; position: relative; }
+.interlude__img { position: absolute; inset: -14% 0; will-change: transform; }
+.interlude__img img { width: 100%; height: 100%; object-fit: cover; }
 
 /* ---------- section heads ---------- */
 .section { padding-block: clamp(56px, 8vw, 128px); }

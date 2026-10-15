@@ -118,6 +118,7 @@
       para.forEach(function (el) {
         var rr = el.getBoundingClientRect();
         var off = (rr.top + rr.height / 2 - vh / 2) * parseFloat(el.getAttribute('data-parallax'));
+        var lim = rr.height * .12; off = Math.max(-lim, Math.min(lim, off));
         el.style.transform = 'translateY(' + off.toFixed(1) + 'px)';
       });
       if (cover) {
