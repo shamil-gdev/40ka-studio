@@ -4,8 +4,8 @@
   html.classList.add('js');
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---- intro curtain, then the magpie draws itself ---- */
-  var intro = document.querySelector('.intro');
+  /* ---- intro: the magpie lands, then the page starts ---- */
+  var intro = document.getElementById('intro');
   var seen = false;
   try { seen = sessionStorage.getItem('40ka-intro') === '1'; } catch (e) {}
   function start() {
@@ -13,16 +13,29 @@
     body.classList.add('bird-ready');
   }
   if (!intro || reduce || seen) {
+    if (intro) intro.remove();
     body.classList.add('intro-skip');
     start();
   } else {
     body.classList.add('intro-wait');
-    setTimeout(function () {
+    body.style.overflow = 'hidden';
+    ['branch', 'smear'].forEach(function (id) {
+      var p = document.getElementById(id);
+      if (p && p.getTotalLength) p.style.setProperty('--len', p.getTotalLength());
+    });
+    var finished = false;
+    function finish() {
+      if (finished) return; finished = true;
+      intro.classList.add('done');
+      body.style.overflow = '';
+      body.classList.add('arrived');        /* the bird already landed in the intro: sit her on the hero branch at once */
       body.classList.add('intro-done');
       start();
       try { sessionStorage.setItem('40ka-intro', '1'); } catch (e) {}
-      setTimeout(function () { intro.remove(); }, 1100);
-    }, 2100);
+      setTimeout(function () { intro.remove(); }, 800);
+    }
+    intro.addEventListener('click', finish);
+    setTimeout(finish, 4000);
   }
 
   /* ---- cursor ---- */
