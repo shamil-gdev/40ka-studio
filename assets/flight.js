@@ -59,7 +59,7 @@
   // the last moments of a flight ease every part back to the drawn pose, so the hand-off is exact
   function rest(st, k) {
     if (k <= 0) return st;
-    ['rot', 'bob', 'head', 'tail', 'fan', 'legRot', 'pdx', 'pdy', 'blur'].forEach(function (n) { st[n] = (st[n] || 0) * (1 - k); });
+    ['rot', 'bob', 'head', 'tail', 'fan', 'legRot', 'pdx', 'pdy', 'blur', 'toe'].forEach(function (n) { st[n] = (st[n] || 0) * (1 - k); });
     st.legS = lerp(st.legS == null ? 1 : st.legS, 1, k);
     return st;
   }
@@ -75,6 +75,7 @@
       var k = sm(t / TL.crouch);
       place(st, H.P, H.s);
       st.bob = 7 * k; st.rot = -7 * k; st.tail = -10 * k; st.legS = 1 - .12 * k;
+      st.plant = 1; st.toe = .25 * k; st.headLock = .7;                    // feet grip, knees bend, head stays
       var w = { p: lerp(.36, .62, k), th: lerp(98, 58, k), flex: lerp(10, 26, k), c: lerp(.38, .72, k), op: k > .3 ? 1 : 0 };
       wingsFrom(st, w); st.patch = 1 - sm(clamp(k * 2, 0, 1));
       f.L0 = H.P; f.s0 = H.s;
@@ -98,13 +99,16 @@
     st.legOp = 1 - sm(seg(tl, .04, .14)) + sm(seg(t, TL.flare - .04, TL.flare + .06));
     st.legRot = lerp(0, -60, sm(seg(tl, .02, .14))) * (1 - sm(seg(t, TL.flare - .04, TL.contact - .02))) + 18 * sm(seg(t, TL.flare - .04, TL.contact - .06)) * (1 - sm(seg(t, TL.contact - .04, TL.contact + .04)));
     if (st.legOp > 1) st.legOp = 1;
+    st.plant = sm(seg(t, TL.contact - .02, TL.contact + .02));
+    st.toe = t < TL.flare - .04 ? null : -.3 * (1 - sm(seg(t, TL.contact - .04, TL.contact))) + .25 * sm(seg(t, TL.contact - .02, TL.contact + .03)) * (1 - sm(seg(t, TL.end - .08, TL.end)));
+    st.headLock = t < TL.contact ? .55 : .7;
     // wings: strong beats, a short glide, the flare, then folded
     var w2;
     if (t < TL.flare) {
-      var u = (tl / .17) % 1, amp = 1 - .7 * sm(seg(t, .62, .7)) * (1 - sm(seg(t, .78, .84)));
-      w2 = M.flapPose(u, amp); w2.op = 1;
-      st.bob = amp * (u < .55 ? -4 * Math.sin(Math.PI * u / .55) : 2.4 * Math.sin(Math.PI * (u - .55) / .45));
-      st.tail = -3 * Math.sin(2 * Math.PI * (u + .25));
+      var u = (tl / .17) % 1, bi = Math.floor(tl / .17), amp = 1 - .7 * sm(seg(t, .62, .7)) * (1 - sm(seg(t, .78, .84)));
+      w2 = M.flapPose(u, amp, bi); w2.op = 1;
+      st.bob = M.flapBob(u, amp);
+      st.tail = -3.6 * Math.sin(2 * Math.PI * (u + .13));                // the tail steers a beat behind the wings
       st.patch = 0;
     } else if (t < TL.contact + .02) {
       var h = sm(seg(t, TL.flare, TL.flare + .08));
@@ -113,6 +117,8 @@
     } else {
       var fk = eio(seg(t, TL.contact + .02, TL.end - .02));
       w2 = { p: lerp(.96, .36, fk), th: lerp(-24, 98, fk), flex: lerp(-4, 10, fk), c: lerp(1, .38, fk) };
+      var balL = wobble(t - TL.contact - .03, 7, 9) * (1 - fk);
+      w2.p += .18 * balL; w2.th += 8 * balL;
       st.patch = eo(seg(fk, .75, 1)); w2.op = st.patch > .55 ? 0 : 1;
       st.tail = 16 * (1 - fk) - 8 * wobble(t - TL.contact, 4, 9);
       st.fan = 1 - fk;
@@ -148,6 +154,7 @@
       var wk = Math.sin(Math.PI * k);
       wingsFrom(st, { p: lerp(.36, .8, wk), th: lerp(98, 40, wk), flex: lerp(10, 30, wk), c: lerp(.38, .85, wk), op: wk > .25 ? 1 : 0 });
       st.patch = wk > .25 ? 0 : 1;
+      st.headLock = .6;
       st.y += st.hop * st.s;
       f.L1 = G.P; f.sL = G.s;
       return st;
@@ -179,13 +186,18 @@
     st.legRot = t < TB.legs ? -60 : lerp(22, 0, sm(seg(t, TB.contact - .06, TB.contact + .04)));
     st.legS = t < TB.legs ? .4 : 1;
     if (t >= TB.legs && t < TB.contact - .06) st.legRot = lerp(-60, 22, sm(seg(t, TB.legs, TB.contact - .1)));
+    // feet: spread as they reach for the branch, grip it on contact, stay planted (except during the hop round)
+    st.plant = sm(seg(t, TB.contact - .03, TB.contact + .02));
+    if (turns && t >= TB.turn2 - .05 && t < TB.turn2End + .05) st.plant *= 1 - Math.sin(Math.PI * seg(t, TB.turn2 - .05, TB.turn2End + .05));
+    if (t >= TB.legs) st.toe = -.3 * sm(seg(t, TB.legs, TB.legs + .1)) * (1 - sm(seg(t, TB.contact - .04, TB.contact + .01))) + .28 * sm(seg(t, TB.contact - .02, TB.contact + .04)) * (1 - sm(seg(t, TB.end - .3, TB.end - .05)));
+    st.headLock = t < TB.contact ? .55 : .72;
     // wings
     var w2;
     if (t < TB.flare) {
-      var u = ((t - TB.turn) / .19) % 1, amp = 1 - .8 * sm(seg(t, .5, .58)) * (1 - sm(seg(t, .74, .8)));
-      w2 = M.flapPose(u, amp); w2.op = 1;
-      st.bob = amp * (u < .55 ? -4 * Math.sin(Math.PI * u / .55) : 2.4 * Math.sin(Math.PI * (u - .55) / .45));
-      st.tail = -3 * Math.sin(2 * Math.PI * (u + .25)); st.patch = 0;
+      var u = ((t - TB.turn) / .19) % 1, bi = Math.floor((t - TB.turn) / .19), amp = 1 - .8 * sm(seg(t, .5, .58)) * (1 - sm(seg(t, .74, .8)));
+      w2 = M.flapPose(u, amp, bi); w2.op = 1;
+      st.bob = M.flapBob(u, amp);
+      st.tail = -3.6 * Math.sin(2 * Math.PI * (u + .13)); st.patch = 0;
     } else if (t < TB.contact + .1) {
       var h = sm(seg(t, TB.flare, TB.flare + .08));
       w2 = { p: lerp(.8, .97, h), th: lerp(6, -26, h) + 16 * sm(seg(t, TB.contact, TB.contact + .1)), flex: -6, op: 1 };
@@ -193,6 +205,8 @@
     } else {
       var fk = eio(seg(t, TB.contact + .1, TB.fold));
       w2 = { p: lerp(.97, .36, fk), th: lerp(-10, 98, fk), flex: lerp(-6, 10, fk), c: lerp(1, .38, fk) };
+      var balB = wobble(t - TB.contact - .06, 6.5, 8) * (1 - fk);
+      w2.p += .2 * balB; w2.th += 9 * balB; w2.flex += 8 * balB;
       st.patch = eo(seg(fk, .75, 1)); w2.op = st.patch > .55 ? 0 : 1;
       if (turns && t >= TB.turn2 - .04 && t < TB.turn2End + .08) {
         var wk2 = Math.sin(Math.PI * seg(t, TB.turn2 - .04, TB.turn2End + .08));
@@ -218,6 +232,66 @@
     if (t < TB.contact) return 0;
     var b = 7 * wobble(t - TB.contact, 2.2, 4.2) + 3.5 * wobble(t - TB.turn2, 3, 6) + 4.5 * wobble(t - TB.turn2End, 2.6, 5);
     return b * (1 - sm(seg(t, TB.end - .16, TB.end)));
+  }
+
+  /* ---------- a flight between any two places that may move with the page (the guide uses it) ----------
+     f.from() / f.to() return { P: screen point of C, s: scale } live; f.dur seconds; f.startFace, f.endFace. */
+  function fly(t, f) {
+    var st = base(), D = f.dur, LIFT = .14, FLARE = D - .3, CONTACT = D - .16;
+    var A = f.from(), B = f.to();
+    if (t < LIFT) {
+      var k = sm(t / LIFT), sf = f.startFace || 1;
+      f.L0 = A.P; f.s0 = A.s;
+      var B0 = B.P, face0 = B0[0] > A.P[0] + 4 ? -1 : 1;
+      place(st, A.P, A.s);
+      st.plant = 1; st.toe = .25 * k; st.headLock = .7;
+      if (sf !== face0) { st.flip = (k < .5 ? sf : face0) * (1 - .42 * Math.sin(Math.PI * k)); st.hop = -12 * Math.sin(Math.PI * k); st.y += st.hop * st.s; st.plant = 0; }
+      else { st.flip = sf; st.bob = 6 * k; st.rot = -6 * k; st.tail = -8 * k; }
+      var wk = Math.sin(Math.PI * k);
+      wingsFrom(st, { p: lerp(.36, .7, wk), th: lerp(98, 50, wk), flex: lerp(10, 28, wk), c: lerp(.38, .8, wk), op: wk > .25 ? 1 : 0 });
+      st.patch = wk > .25 ? 0 : 1;
+      return st;
+    }
+    var L0 = f.L0 || A.P, s0 = f.s0 || A.s, L1 = B.P;
+    var dx = L1[0] - L0[0], dy = L1[1] - L0[1], dist = Math.hypot(dx, dy);
+    var face = dx > 4 ? -1 : 1;
+    var up = Math.min(160, 50 + dist * .22);
+    var c1 = [L0[0] + dx * .28, L0[1] + dy * .1 - up], c2 = [L0[0] + dx * .78, L1[1] - up * .55];
+    var tau = seg(t, LIFT, CONTACT), q = .3 * tau + .7 * sm(tau);
+    var P = bez(L0, c1, c2, L1, q), Pa = bez(L0, c1, c2, L1, clamp(q - .01, 0, 1)), Pb = bez(L0, c1, c2, L1, clamp(q + .01, 0, 1));
+    place(st, P, s0 * Math.pow(B.s / s0, sm(q)));
+    st.flip = face;
+    var flare = sm(seg(t, FLARE, CONTACT - .02));
+    st.rot = clamp(heading(Pb[0] - Pa[0], Pb[1] - Pa[1], face), -30, 28) * .6 * (1 - flare) + 18 * flare;
+    if (t >= CONTACT) st.rot = 18 * (1 - spring(t - CONTACT, 3, .45));
+    var tl = t - LIFT, w2;
+    if (t < FLARE) {
+      var u = (tl / .17) % 1, bi = Math.floor(tl / .17);
+      w2 = M.flapPose(u, 1, bi); w2.op = 1;
+      st.bob = M.flapBob(u, 1);
+      st.tail = -3.6 * Math.sin(2 * Math.PI * (u + .13)); st.patch = 0;
+    } else if (t < CONTACT + .02) {
+      var h = sm(seg(t, FLARE, FLARE + .08));
+      w2 = { p: lerp(.8, .96, h), th: lerp(6, -24, h), flex: -4, op: 1 };
+      st.tail = 16 * flare; st.fan = flare; st.patch = 0;
+    } else {
+      var fk = eio(seg(t, CONTACT + .02, D - .02));
+      w2 = { p: lerp(.96, .36, fk), th: lerp(-24, 98, fk), flex: lerp(-4, 10, fk), c: lerp(1, .38, fk) };
+      var bal = wobble(t - CONTACT - .03, 7, 9) * (1 - fk);
+      w2.p += .18 * bal; w2.th += 8 * bal;
+      st.patch = eo(seg(fk, .75, 1)); w2.op = st.patch > .55 ? 0 : 1;
+      st.tail = 16 * (1 - fk) - 8 * wobble(t - CONTACT, 4, 9); st.fan = 1 - fk;
+    }
+    if (w2.op && Math.abs(w2.p) < .06) w2.op = 0;
+    wingsFrom(st, w2);
+    st.legOp = 1 - sm(seg(tl, .04, .14)) + sm(seg(t, FLARE - .04, FLARE + .06)); if (st.legOp > 1) st.legOp = 1;
+    st.legRot = lerp(0, -60, sm(seg(tl, .02, .14))) * (1 - sm(seg(t, FLARE - .04, CONTACT - .02))) + 18 * sm(seg(t, FLARE - .04, CONTACT - .06)) * (1 - sm(seg(t, CONTACT - .04, CONTACT + .04)));
+    st.plant = sm(seg(t, CONTACT - .02, CONTACT + .02));
+    st.toe = t < FLARE - .04 ? null : -.3 * (1 - sm(seg(t, CONTACT - .04, CONTACT))) + .25 * sm(seg(t, CONTACT - .02, CONTACT + .03)) * (1 - sm(seg(t, D - .08, D)));
+    st.headLock = t < CONTACT ? .55 : .7;
+    st.head = clamp(-st.rot * .3, -5, 5);
+    f.face = face;
+    return rest(st, sm(seg(t, D - .1, D)));
   }
 
   /* ---------- branch and leaves on the page ---------- */
@@ -251,6 +325,11 @@
       setClasses('bird-away', true);
       setClasses('bird-logo', t >= TL.slotOpen);
       setClasses('bird-inbound', true);
+    } else if (kind === 'toLine' || kind === 'lineToLogo') {
+      var sg = fly(t, f); rig.set(sg); ink(sg);
+      setClasses('bird-away', true);
+      setClasses('bird-logo', kind === 'lineToLogo' ? t >= f.dur - .9 : t < .4);
+      setClasses('bird-inbound', true);
     } else {
       var sb = toBranch(t, f); rig.set(sb); ink(sb);
       setBranch(bendToBranch, t);
@@ -261,6 +340,8 @@
   }
   function settle(where) {
     state = where; flight = null;
+    if (where === 'line') { layer.classList.add('on'); setClasses('bird-flying', false); setClasses('bird-inbound', true); setClasses('bird-away', true); setClasses('bird-logo', false); guide.start(); return; }
+    guide.stop();
     layer.classList.remove('on');
     setClasses('bird-flying', false);
     setClasses('bird-inbound', false);
@@ -271,8 +352,10 @@
   function start(kind) {
     var o = kind === 'toBranch' ? alive.offset() : [0, 0];
     flight = { kind: kind, t0: null, f: { startFace: kind === 'toBranch' ? alive.face() : 1, ox: o[0], oy: o[1] } };
+    if (kind === 'toLine') flight.f = guide.flightIn(alive.face(), o);
+    if (kind === 'lineToLogo') flight.f = guide.flightOut();
     alive.reset();
-    if (kind === 'toBranch') alive.launch();
+    if (kind === 'toBranch' || kind === 'toLine') alive.launch();
     state = kind;
     layer.classList.add('on');
     setClasses('bird-flying', true);
@@ -282,10 +365,12 @@
     raf = null;
     if (!flight) return;
     if (flight.t0 == null) flight.t0 = now;
-    var t = (now - flight.t0) / 1000, dur = flight.kind === 'toLogo' ? TL.end : TB.end;
+    var t = (now - flight.t0) / 1000, dur = flight.kind === 'toLogo' ? TL.end : flight.kind === 'toBranch' ? TB.end : flight.f.dur;
     if (t >= dur) {
       frame(flight.kind, dur, flight.f);
-      var landed = flight.kind === 'toLogo';
+      var k = flight.kind, landed = k === 'toLogo' || k === 'lineToLogo';
+      if (k === 'toLine') { settle('line'); check(); return; }
+      if (k === 'lineToLogo') alive.setFace(flight.f.face || 1);
       settle(landed ? 'logo' : 'branch');
       if (landed) alive.land();
       check();                                   // the visitor may already want the other place
@@ -302,9 +387,11 @@
   }
   function check() {
     if (!enabled || flight || body.classList.contains('menu-open') || document.getElementById('intro')) return;
-    var w = wanted();
+    var w = wanted(), g = guide.wanted();
+    if (state === 'line') { if (!g || w === 'branch') start('lineToLogo'); return; }
     if (w === 'logo' && state === 'branch') start('toLogo');
     else if (w === 'branch' && state === 'logo') start('toBranch');
+    else if (state === 'logo' && g) start('toLine');
   }
 
   function enable() {
@@ -314,12 +401,7 @@
     window.addEventListener('resize', size);
     size();
   }
-  // wait until she has arrived on the branch (after the intro or the short arrival)
-  (function waitReady() {
-    if (body.classList.contains('arrived')) { enable(); return; }
-    if (body.classList.contains('intro-skip') && body.classList.contains('bird-ready')) { setTimeout(enable, 2300); return; }
-    setTimeout(waitReady, 120);
-  })();
+
 
 
   /* ---------- the magpie in the logo is alive ----------
@@ -530,10 +612,143 @@
     };
     return {
       face: function () { return S.face; },
+      setFace: function (f) { S.face = f === -1 ? -1 : 1; render(); },
       offset: function () { return [S.pos * PX, S.pos * SLOPE * PX]; },
       reset: clear,
       land: function () { S.dipV += 34; setTimeout(function () { if (on() && !G) { last = 'pump'; play(GEST.pump()); } }, 350); wake(); },
       launch: function () { S.dipV -= 30; wake(); }
+    };
+  })();
+
+  /* ---------- the guide: in «Как работаем» she comes down from the logo, stands on the line and walks along it
+     behind the pen as the visitor scrolls through the steps; on phones she hops from one step's line to the next.
+     When the section leaves the screen she flies back to the logo. ---------- */
+  var guide = (function () {
+    var sec = document.getElementById('process');
+    var noop = { wanted: function () { return false; }, start: function () {}, stop: function () {}, flightIn: function () { return {}; }, flightOut: function () { return {}; } };
+    if (!sec) return noop;
+    // steps.js loads after this file: ask it lazily
+    var S = {};
+    ['progress', 'rect', 'at', 'length', 'stepAt', 'count'].forEach(function (n) { S[n] = function (a, b) { return window.__steps[n](a, b); }; });
+    S.mode = function () { return window.__steps ? window.__steps.mode() : null; };
+    var W = { loc: null, face: -1, hop: null, last: 0, raf: null, idleAt: 0, gest: null };
+    function bs() { return (S.mode() === 'mob' ? 76 : 100) / VB_W; }
+    // where she stands: desktop {p}, phones {i}; returns the screen point of her feet on the line
+    function pt(loc) {
+      if (!loc) return null;
+      if (loc.p != null) return S.at(loc.p);
+      return S.stepAt(loc.i, .16);
+    }
+    function frameAt(loc) {
+      var q = pt(loc) || [window.innerWidth / 2, window.innerHeight / 2], s = bs();
+      return { P: [q[0] - 8 * s, q[1] - 112 * s], s: s };      // feet (≈190, 207 in the drawing) on the line
+    }
+    function target() {
+      var m = S.mode();
+      if (m === 'desk') {
+        var L = S.length() || 1, lag = 46 / L;
+        return { p: clamp(S.progress() - lag, .03, .96) };
+      }
+      if (m === 'mob') {
+        var best = 0, bd = 1e9, vh = window.innerHeight;
+        for (var i = 0; i < S.count(); i++) { var q = S.stepAt(i, .16); if (!q) continue; var d = Math.abs(q[1] - vh * .42); if (d < bd) { bd = d; best = i; } }
+        return { i: best };
+      }
+      return null;
+    }
+    function wanted() {
+      var m = S.mode(); if (!m) return false;
+      var r = S.rect(), vh = window.innerHeight, on = state === 'line';     // a wider zone to stay than to come
+      if (m === 'desk') return on ? (r.top < vh * .84 && r.top > vh * .16) : (r.top < vh * .72 && r.top > vh * .22);
+      return on ? (r.top < vh * .66 && r.bottom > vh * .22) : (r.top < vh * .55 && r.bottom > vh * .32);
+    }
+    function dist(a, b) { var A = pt(a), B = pt(b); return A && B ? Math.hypot(B[0] - A[0], B[1] - A[1]) : 0; }
+
+    /* one step of her walk: a hop along the line (or, on phones, a short flight down to the next step) */
+    function hopState(h, now) {
+      var k = clamp((now - h.t0) / h.dur, 0, 1), A = frameAt(h.from), B = frameAt(h.to), s = B.s;
+      var st = base(); st.s = s;
+      var e = eio(k), x = lerp(A.P[0], B.P[0], e), y = lerp(A.P[1], B.P[1], e) - h.arc * Math.sin(Math.PI * k);
+      place(st, [x, y], s);
+      var turn = h.face !== h.face0;
+      st.flip = turn && k < .5 ? h.face0 * (1 - .5 * Math.sin(Math.PI * k)) : h.face * (turn ? (1 - .5 * Math.sin(Math.PI * k)) : 1);
+      var air = Math.sin(Math.PI * k);
+      st.rot = -5 * air + (k > .85 ? 6 * wobble(k - .85, 3, 9) : 0);
+      st.legRot = -26 * air; st.plant = k < .12 || k > .9 ? 1 : 0; st.toe = .3 * air;
+      st.tail = -9 * air + (k > .9 ? 10 * wobble(k - .9, 4, 10) : 0);
+      st.headLock = .75;
+      if (h.flap) {
+        var u = (k * h.dur / 1000 / .17) % 1, bi = Math.floor(k * h.dur / 1000 / .17), amp = sm(seg(k, .04, .2)) * (1 - sm(seg(k, .78, .95)));
+        var w = M.flapPose(u, amp, bi); w.op = amp > .05 ? 1 : 0; wingsFrom(st, w); st.patch = amp > .05 ? 0 : 1;
+      } else {
+        var wk = Math.sin(Math.PI * clamp(k * 1.3, 0, 1)) * .55;          // a little lift of the wings for balance
+        wingsFrom(st, { p: lerp(.36, .62, wk), th: lerp(98, 60, wk), flex: lerp(10, 24, wk), c: lerp(.38, .7, wk), op: wk > .12 ? 1 : 0 });
+        st.patch = wk > .12 ? 0 : 1;
+      }
+      return st;
+    }
+    function standState(now) {
+      var F = frameAt(W.loc), st = base(); place(st, F.P, F.s); st.flip = W.face; st.plant = 1; st.headLock = .75;
+      var g = W.gest, gt = g ? (now - g.t0) / 1000 : 9;
+      if (g && gt < g.dur) {
+        if (g.kind === 'peck') { var pk = Math.max(Math.sin(Math.PI * clamp(gt / .2, 0, 1)), Math.sin(Math.PI * clamp((gt - .3) / .2, 0, 1))); st.rot = -16 * pk; st.headLock = .2; st.tail = 5 * pk; }
+        else { var pp = Math.exp(-2.4 * gt) * (.5 - .5 * Math.cos(2 * Math.PI * 2.5 * gt)); st.tail = -26 * pp; st.rot = 2 * pp; }
+      }
+      return st;
+    }
+    function tickWalk(now) {
+      W.raf = null;
+      if (state !== 'line') return;
+      var st;
+      if (W.hop) {
+        if (now - W.hop.t0 >= W.hop.dur) { W.loc = W.hop.to; W.face = W.hop.face; W.hop = null; W.idleAt = now; }
+      }
+      if (!W.hop) {
+        var tg = target();
+        if (tg) {
+          var d = dist(W.loc, tg), m = S.mode();
+          if (m === 'desk' && d > 22) {
+            var dir = tg.p > W.loc.p ? 1 : -1, L = S.length() || 1, far = d > 260;
+            var stepP = Math.min(Math.abs(tg.p - W.loc.p), (far ? 220 : d > 140 ? 76 : 52) / L);
+            var to = { p: W.loc.p + dir * stepP };
+            // little hops behind the pen; if it ran far ahead, a short flight along the line
+            W.hop = { from: W.loc, to: to, t0: now, dur: far ? 560 : d > 140 ? 270 : 330, arc: far ? 46 : 12 + 30 * stepP * L / 76, face0: W.face, face: dir > 0 ? -1 : 1, flap: far };
+          } else if (m === 'mob' && tg.i !== W.loc.i) {
+            var down = tg.i > W.loc.i, gap = dist(W.loc, tg);
+            W.hop = { from: W.loc, to: tg, t0: now, dur: clamp(380 + gap * .9, 420, 760), arc: 40 + gap * .12, face0: W.face, face: W.face, flap: true };
+          }
+        }
+      }
+      if (W.hop) st = hopState(W.hop, now);
+      else {
+        if (!W.gest && now - W.idleAt > 2600 + Math.random() * 2600) { W.gest = { kind: Math.random() < .5 ? 'peck' : 'pump', t0: now, dur: .9 }; W.idleAt = now; }
+        if (W.gest && (now - W.gest.t0) / 1000 > W.gest.dur) W.gest = null;
+        st = standState(now);
+      }
+      size(); rig.set(st); ink(st);
+      W.raf = requestAnimationFrame(tickWalk);
+    }
+    return {
+      wanted: wanted,
+      start: function () { W.idleAt = performance.now(); if (!W.raf) W.raf = requestAnimationFrame(tickWalk); },
+      stop: function () { if (W.raf) cancelAnimationFrame(W.raf); W.raf = null; W.hop = null; W.gest = null; },
+      // logo -> line: she lands where the pen is now
+      flightIn: function (face, off) {
+        W.loc = target() || { p: .05 }; W.hop = null;
+        var to = W.loc, f = { dur: 1.15, startFace: face || 1 };
+        f.from = function () { var G = logoFrame(); return { P: [G.P[0] + (off ? off[0] : 0), G.P[1] + (off ? off[1] : 0)], s: G.s }; };
+        f.to = function () { return frameAt(to); };
+        var a = f.from().P, b = f.to().P; W.face = b[0] > a[0] + 4 ? -1 : 1;
+        return f;
+      },
+      // line -> logo
+      flightOut: function () {
+        var from = W.hop ? W.hop.to : W.loc, f = { dur: 1.05, startFace: W.face };
+        if (W.raf) cancelAnimationFrame(W.raf); W.raf = null; W.hop = null;
+        f.from = function () { return frameAt(from); };
+        f.to = function () { return logoFrame(); };
+        return f;
+      }
     };
   })();
 
@@ -548,4 +763,10 @@
     },
     settle: settle, T: { toLogo: TL, toBranch: TB }, state: function () { return state; }
   };
+  // wait until she has arrived on the branch (after the intro or the short arrival)
+  (function waitReady() {
+    if (body.classList.contains('arrived')) { enable(); return; }
+    if (body.classList.contains('intro-skip') && body.classList.contains('bird-ready')) { setTimeout(enable, 2300); return; }
+    setTimeout(waitReady, 120);
+  })();
 })();
