@@ -13,6 +13,20 @@
   try { returning = sessionStorage.getItem('40ka-visited') === '1' && !reloaded; sessionStorage.setItem('40ka-visited', '1'); } catch (e) {}
   if (returning) body.classList.add('returning');
 
+  /* ---- the hero branch comes in from the right edge: its CSS draw-in starts where it enters the screen ---- */
+  (function () {
+    var hb = document.getElementById('heroBird'), mp = hb && hb.querySelector('.mp-branch');
+    if (!mp || !mp.getTotalLength) return;
+    function measure() {
+      var L = mp.getTotalLength(), r = hb.getBoundingClientRect(), s = r.width / 477.5 || 1;
+      var edge = (window.innerWidth - r.left) / s, n = 100, off = 0;
+      for (var i = 0; i <= n; i++) { if (mp.getPointAtLength(L * i / n).x <= edge) { off = i / n; break; } }
+      hb.style.setProperty('--bl', L.toFixed(0));
+      hb.style.setProperty('--b0', (L * (1 - Math.max(0, off - .02))).toFixed(0));
+    }
+    measure();
+  })();
+
   /* ---- intro: see assets/intro.js (pages without an intro start right away) ---- */
   if (!document.getElementById('intro')) { body.classList.remove('intro-wait'); body.classList.add('intro-skip', 'bird-ready'); }
 

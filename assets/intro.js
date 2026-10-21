@@ -222,6 +222,31 @@
     });
   }
 
+  /* the hero branch grows in from the right edge of the screen: its base (data-anchor) is off-screen,
+     so a bend is a turn about that base. b = how far it dips (units) under the magpie's feet. */
+  var FEET_X = 198;
+  function branchBend(wrap, b) {
+    var a = (wrap.getAttribute('data-anchor') || '').split(' ').map(Number);
+    if (a.length !== 2 || isNaN(a[0])) return 'translate(0 ' + b.toFixed(2) + ')';
+    var ang = -Math.atan2(b, a[0] - FEET_X) * 180 / Math.PI;
+    return 'rotate(' + ang.toFixed(3) + ' ' + a[0] + ' ' + a[1] + ')';
+  }
+  // how much of the branch (from its base) is off-screen to the right, as a fraction of its length,
+  // and where along the branch each leaf sits (0 = base, 1 = tip), so the drawing starts at the screen edge
+  function branchReach(wrap, svgRect, scale) {
+    var path = wrap.querySelector('.mp-branch');
+    if (!path || !path.getTotalLength) return { L: 600, off: 0, at: function () { return 0; } };
+    var L = path.getTotalLength(), n = 120, pts = [];
+    for (var i = 0; i <= n; i++) { var q = path.getPointAtLength(L * i / n); pts.push([q.x, q.y]); }
+    var edge = (window.innerWidth - svgRect.left) / scale, off = 0;
+    for (var j = 0; j <= n; j++) { if (pts[j][0] <= edge) { off = j / n; break; } }
+    return { L: L, off: Math.max(0, off - .02), at: function (x, y) {
+      var best = 0, bd = 1e9;
+      for (var k = 0; k <= n; k++) { var d = Math.hypot(pts[k][0] - x, pts[k][1] - y); if (d < bd) { bd = d; best = k; } }
+      return best / n;
+    } };
+  }
+
   /* ---------- wingbeat ---------- */
   // u: phase 0..1 (0 = top of the stroke). Downstroke 0..0.55, upstroke 0.55..1.
   function flapPose(u, amp) {
@@ -239,7 +264,7 @@
     return { p: lerp(glideP, p, amp), th: lerp(glideTh, th, amp), flex: lerp(glideFlex, flex, amp) };
   }
 
-  window.MagpieIntro = { buildRig: buildRig, flapPose: flapPose, el: el, C: C, swayLeaves: swayLeaves, cloneLeaves: cloneLeaves, leafList: leafList,
+  window.MagpieIntro = { buildRig: buildRig, flapPose: flapPose, el: el, C: C, swayLeaves: swayLeaves, cloneLeaves: cloneLeaves, leafList: leafList, branchBend: branchBend, branchReach: branchReach,
     util: { clamp: clamp, lerp: lerp, seg: seg, sm: sm, eio: eio, eo: eo, ei: ei, backOut: backOut, bez: bez, spring: spring, wobble: wobble } };
 
   /* =====================================================================
@@ -320,6 +345,8 @@
     L.vw = vw; L.vh = vh; L.s1 = s1;
     L.P1 = [R.left + C[0] * s1, R.top + C[1] * s1];
     branchG.setAttribute('transform', 'translate(' + R.left.toFixed(2) + ' ' + R.top.toFixed(2) + ') scale(' + s1.toFixed(4) + ')');
+    L.reach = branchReach(bwrap, R, s1);
+    leaves.forEach(function (Lf) { Lf.f = L.reach.at(Lf.x, Lf.y); });
     // glint: just above the end of the first headline word
     var line = document.querySelector('.hero__title .l'), word = line && line.firstElementChild;
     var lr = line ? line.getBoundingClientRect() : { left: vw * .2, top: vh * .3, height: 60, width: 200 };
@@ -506,13 +533,15 @@
   }
   function renderAt(t) {
     var A = L.mode === 'A';
-    var drawn = eio(seg(t, 0, .42));
+    // the branch grows in from the edge of the screen (the part beyond the edge counts as already there)
+    var off = L.reach ? L.reach.off : 0;
+    var drawn = off + (1 - off) * eio(seg(t, 0, .42));
     branch.setAttribute('stroke-dashoffset', (branchLen * (1 - drawn)).toFixed(1));
     var bend = bendAt(t);
-    bwrap.setAttribute('transform', 'translate(0 ' + bend.toFixed(2) + ')');
+    bwrap.setAttribute('transform', branchBend(bwrap, bend));
     swayLeaves(leaves, bendAt, t, 0, function (Lf) {
-      var x0 = Lf.x / 412;                                  // a leaf unfolds once the line reaches it
-      return Math.max(.001, backOut(seg(drawn, x0 * .9, x0 * .9 + .18), 2));
+      var x0 = Math.min(Lf.f != null ? Lf.f : Lf.x / 412, .9);   // a leaf unfolds once the line reaches it
+      return Math.max(.001, backOut(seg(drawn, x0, x0 + .1), 2));
     });
     var st = state(t);
     if (t >= T.contact && st.hop === 0) st.y += bend * L.s1;
