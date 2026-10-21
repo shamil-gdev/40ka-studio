@@ -4,9 +4,13 @@
   html.classList.add('js');
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---- second and later pages of a visit: no grand entrances, everything is already in place ---- */
+  /* ---- second and later pages of a visit: no grand entrances, everything is already in place.
+     A reload is a fresh start: the visitor asked to see the page again, so it arrives in full (intro included). ---- */
+  var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+  var reloaded = nav ? nav.type === 'reload' : !!(performance.navigation && performance.navigation.type === 1);
+  if (reloaded) body.classList.add('reloaded');
   var returning = false;
-  try { returning = sessionStorage.getItem('40ka-visited') === '1'; sessionStorage.setItem('40ka-visited', '1'); } catch (e) {}
+  try { returning = sessionStorage.getItem('40ka-visited') === '1' && !reloaded; sessionStorage.setItem('40ka-visited', '1'); } catch (e) {}
   if (returning) body.classList.add('returning');
 
   /* ---- intro: see assets/intro.js (pages without an intro start right away) ---- */
