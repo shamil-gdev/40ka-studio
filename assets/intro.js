@@ -558,7 +558,7 @@
     window.scrollTo({ top: 0, behavior: 'instant' });
     ['arrived', 'intro-done', 'bird-ready', 'flying'].forEach(function (c) { body.classList.remove(c); });
     body.classList.add('intro-wait');
-    document.querySelectorAll('.hero__title .l > span, .shelf a').forEach(function (n) {
+    document.querySelectorAll('.hero__title .l > span').forEach(function (n) {
       n.style.animation = 'none'; void n.offsetWidth; n.style.animation = '';      // restart their entrance
     });
     intro.classList.remove('done');
