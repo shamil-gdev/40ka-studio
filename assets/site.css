@@ -338,7 +338,7 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
   .cards .card:hover { border-color: #3a3a46; }
 }
 .card__top { display: flex; justify-content: space-between; font: 300 13px/1 var(--font-mono); color: #8b8d8a; text-transform: uppercase; letter-spacing: .04em; }
-.card h3 { margin-top: auto; padding-top: 56px; font-family: var(--font-display); font-weight: 300; font-size: clamp(26px, 2.6vw, 40px); letter-spacing: -.03em; line-height: 1.05; max-width: 11ch; }
+.card h3 { margin-top: auto; padding-top: 56px; font-family: var(--font-display); font-weight: 300; font-size: clamp(40px, 4.6vw, 68px); letter-spacing: -.035em; line-height: 1; }
 .card__for { margin-top: 14px; font-size: 15px; color: #a9aba8; max-width: 30ch; }
 .card__chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
 .card__chips span { font: 300 12px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .03em; border: 1px solid #444; border-radius: 99px; padding: 8px 11px; color: #d7d8d6; }
@@ -357,6 +357,8 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
 .card__more[open] .card__body { animation: cardOpen .5s var(--ease) both; }
 @keyframes cardOpen { from { opacity: 0; transform: translateY(-6px); } }
 @media (max-width: 900px) { .cards { grid-template-columns: 1fr; } .card { min-height: 0; } .card h3 { padding-top: 44px; } }
+.services__proof { margin-top: clamp(28px, 3vw, 44px); display: flex; align-items: center; gap: 16px; font-size: 16px; line-height: 1.5; color: #c4c6c3; max-width: 72ch; }
+.services__proof-mark { flex: none; width: 54px; height: auto; fill: var(--white); color: var(--white); }
 .services__note { margin-top: 28px; display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; font-size: 15px; color: var(--ink-soft); }
 .services__note b { color: var(--ink); font-weight: 500; }
 
