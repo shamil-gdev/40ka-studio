@@ -324,8 +324,8 @@
 
   /* ---------- the magpie in the logo is alive ----------
      A small procedural character living on her own (she does not follow the mouse): every few seconds
-     she pumps her tail like a real magpie, pecks at the branch, steps along it, looks down, sits up or
-     shakes her feathers; she leans a little into the scroll and settles when it stops.
+     she pumps her tail like a real magpie, pecks at the branch, steps along it, turns round now and then,
+     looks down at the page, sits up or shakes her feathers; she leans a little into the scroll and settles when it stops.
      The logo branch is a spring: it dips under her hops, she rides it, the leaves swing a beat later. */
   var alive = (function () {
     var stub = { face: function () { return 1; }, offset: function () { return [0, 0]; }, reset: function () {}, land: function () {}, launch: function () {} };
@@ -392,9 +392,21 @@
         var k = sm(seg(t, 0, .18)) * (1 - sm(seg(t, 1.05, 1.3)));
         var f = t > 1.25 ? -12 * wobble(t - 1.25, 3, 7) : 0;
         return { sy: 1 + .08 * k, y: -3 * k, r: 7 * k - 3 * sm(seg(t, .55, .7)) * k, tail: 6 * k + f }; } }; },
-      look: function () { return { name: 'look', dur: 1.8, fn: function (t, g) {
-        var k = sm(seg(t, 0, .22)) * (1 - sm(seg(t, 1.35, 1.65)));
-        return { r: -10 * k, y: 1 * k, tail: 3 * k }; } }; },
+      look: function () { return { name: 'look', dur: 2.2, fn: function (t, g) {
+        var k = sm(seg(t, 0, .3)) * (1 - sm(seg(t, 1.7, 2.05)));
+        return { r: -12 * k, y: 1.2 * k, tail: 3.5 * k }; } }; },
+      // a calm turn round on the spot: a small lift, the body turns through edge-on (no mirror pop), a soft landing
+      turn: function () { return { name: 'turn', dur: .8, end: function () { S.face = -S.face; }, fn: function (t, g) {
+        var o = { y: 0, r: 0, sy: 1, tail: 0, flip: 1 };
+        if (t < .12) { var c = sm(t / .12); o.sy = 1 - .06 * c; o.tail = -3 * c; }
+        else if (t < .52) {
+          var k = (t - .12) / .4, a = Math.sin(Math.PI * k);
+          o.y = -9 * a; o.flip = Math.cos(Math.PI * eio(k)); o.tail = -6 * a; o.sy = 1 - .06 * (1 - a) * (k < .2 ? 1 : 0);
+        } else {
+          o.flip = -1; hit(g, t, .52, 12);
+          var w = wobble(t - .52, 3, 9); o.sy = 1 - .05 * Math.abs(w); o.tail = 6 * w;
+        }
+        return o; } }; },
       shuffle: function () {
         var c = POS.filter(function (p) { return Math.abs(p - S.pos) > 6; });
         if (Math.abs(S.pos) > 20) c = c.filter(function (p) { return Math.abs(p) < Math.abs(S.pos); });
@@ -412,7 +424,7 @@
         hit(g, t, .05, -10);
         return { sy: 1 - .12 * k, sx: 1 + .04 * k, y: 3 * k, r: -4 * k, tail: -14 * k - 14 * p }; } }; }
     };
-    var WEIGHTS = [['pump', .3], ['peck', .24], ['look', .16], ['shuffle', .14], ['alert', .1], ['shake', .06]];
+    var WEIGHTS = [['pump', .26], ['peck', .2], ['look', .16], ['turn', .15], ['shuffle', .12], ['alert', .07], ['shake', .04]];
     function pick() {
       var tot = 0, list = WEIGHTS.filter(function (w) { return w[0] !== last; });
       list.forEach(function (w) { tot += w[1]; });
@@ -426,7 +438,10 @@
       else { G = g; G.t = 0; }
       wake();
     }
-    function act(name) { last = name; play(GEST[name]()); }
+    function act(name) {
+      last = name; play(GEST[name]());
+      if (name === 'turn' && Math.random() < .5) play(GEST.look());          // turned round, she sometimes looks down at the page
+    }
     function idle() {
       clearTimeout(idleT);
       idleT = setTimeout(function () { if (on() && !G) act(pick()); idle(); }, rnd(4500, 9000));
