@@ -29,7 +29,7 @@
     var m = (navigation.activation.from.url || '').match(/cases\/([a-z]+)\.html/);
     if (!m || /cases\//.test(location.pathname)) return;
     // back from a case: its cover returns into the photo it came from
-    var sel = location.hash === '#works' ? '.work[href$="' + m[1] + '.html"]' : '.shelf a[href$="' + m[1] + '.html"]';
+    var sel = '.work[href$="' + m[1] + '.html"]';
     var a = document.querySelector(sel) || document.querySelector('a[href$="cases/' + m[1] + '.html"]');
     var img = a && a.querySelector('img');
     if (!img) return;
@@ -124,6 +124,7 @@
   var shelfItems = document.querySelectorAll('[data-drift]');
   var lastY = window.scrollY, ticking = false;
   var darkBands = document.querySelectorAll('.band--dark, .contact');
+  var detSec = document.getElementById('details'), detTrack = detSec && detSec.querySelector('.details__track');
   function onScroll() {
     var y = window.scrollY, vh = window.innerHeight;
     body.classList.toggle('scrolled', y > 260);
@@ -153,6 +154,16 @@
         var lim = rr.height * .12; off = Math.max(-lim, Math.min(lim, off));
         el.style.transform = 'translateY(' + off.toFixed(1) + 'px)';
       });
+      if (detTrack) {
+        // the strip travels from its start to its end while the section crosses the screen
+        // (from the moment the strip shows at the bottom of the screen until it leaves at the top)
+        var dr2 = detTrack.getBoundingClientRect();
+        if (dr2.bottom > -100 && dr2.top < vh + 100) {
+          var span = Math.max(0, detTrack.scrollWidth - detSec.clientWidth);
+          var k = Math.max(0, Math.min(1, (vh - dr2.top) / (vh + dr2.height)));
+          detTrack.style.transform = 'translate3d(' + (-span * k).toFixed(1) + 'px,0,0)';
+        }
+      }
       if (cover) {
         var cr = cover.parentNode.getBoundingClientRect();
         var o = Math.max(-1, Math.min(1, (cr.top + cr.height / 2 - vh / 2) / vh));
