@@ -4,57 +4,79 @@
   html.classList.add('js');
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---- intro: the magpie lands, then the page starts ---- */
-  var intro = document.getElementById('intro');
-  var seen = false; /* intro plays on every load */
-  function start() {
-    body.classList.remove('intro-wait');
-    body.classList.add('bird-ready');
-  }
-  if (!intro || reduce || seen) {
-    if (intro) intro.remove();
-    body.classList.add('intro-skip');
-    start();
-  } else {
-    body.classList.add('intro-wait');
-    body.style.overflow = 'hidden';
-    ['branch', 'smear'].forEach(function (id) {
-      var p = document.getElementById(id);
-      if (p && p.getTotalLength) p.style.setProperty('--len', p.getTotalLength());
-    });
-    var finished = false;
-    function finish() {
-      if (finished) return; finished = true;
-      intro.classList.add('done');
-      body.style.overflow = '';
-      body.classList.add('arrived');        /* the bird already landed in the intro: sit her on the hero branch at once */
-      body.classList.add('intro-done');
-      start();
-      setTimeout(function () { intro.remove(); }, 800);
-    }
-    intro.addEventListener('click', finish);
-    setTimeout(finish, 4000);
-  }
+  /* ---- second and later pages of a visit: no grand entrances, everything is already in place ---- */
+  var returning = false;
+  try { returning = sessionStorage.getItem('40ka-visited') === '1'; sessionStorage.setItem('40ka-visited', '1'); } catch (e) {}
+  if (returning) body.classList.add('returning');
+
+  /* ---- intro: see assets/intro.js (pages without an intro start right away) ---- */
+  if (!document.getElementById('intro')) { body.classList.remove('intro-wait'); body.classList.add('intro-skip', 'bird-ready'); }
+
+  /* ---- page transitions into a case and back: name the photo that should morph ---- */
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href*="cases/"], .case-next a');
+    if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    var img = a.querySelector('img');
+    document.querySelectorAll('[style*="view-transition-name"]').forEach(function (n) { n.style.viewTransitionName = ''; });
+    if (img) img.style.viewTransitionName = 'case-cover';
+  }, true);
+  window.addEventListener('pagereveal', function (e) {
+    if (!e.viewTransition || !window.navigation || !navigation.activation || !navigation.activation.from) return;
+    var m = (navigation.activation.from.url || '').match(/cases\/([a-z]+)\.html/);
+    if (!m || /cases\//.test(location.pathname)) return;
+    // back from a case: its cover returns into the photo it came from
+    var sel = location.hash === '#works' ? '.work[href$="' + m[1] + '.html"]' : '.shelf a[href$="' + m[1] + '.html"]';
+    var a = document.querySelector(sel) || document.querySelector('a[href$="cases/' + m[1] + '.html"]');
+    var img = a && a.querySelector('img');
+    if (!img) return;
+    var fig = img.closest('[data-reveal]'); if (fig) fig.classList.add('in');
+    img.style.viewTransitionName = 'case-cover';
+    e.viewTransition.finished.finally(function () { img.style.viewTransitionName = ''; });
+  });
 
   /* ---- cursor ---- */
   var cur = document.querySelector('.cursor');
   if (cur && window.matchMedia('(hover: hover) and (pointer: fine)').matches && !(navigator.maxTouchPoints > 0) && !reduce) {
-    var cx = 0, cy = 0, tx = 0, ty = 0, raf;
+    var cx = 0, cy = 0, tx = 0, ty = 0, raf, curLabel = '';
+    var curText = document.createElement('span'); cur.appendChild(curText);
     document.addEventListener('mousemove', function (e) {
       tx = e.clientX; ty = e.clientY;
       if (!body.classList.contains('cursor-on')) { cx = tx; cy = ty; body.classList.add('cursor-on'); }
       var t = e.target.closest && e.target.closest('a, button');
-      body.classList.toggle('cursor-link', !!t && !t.querySelector('img'));
-      body.classList.toggle('cursor-img', !!t && !!t.querySelector('img'));
+      // a label inside the cursor says what a click will do: data-cursor, or "Смотреть" over a picture link
+      var lab = t && (t.getAttribute('data-cursor') || (t.querySelector('img') ? 'Смотреть' : ''));
+      if (lab !== curLabel) { curLabel = lab; curText.textContent = lab || ''; }
+      body.classList.toggle('cursor-label', !!lab);
+      body.classList.toggle('cursor-link', !!t && !lab);
+      body.classList.toggle('cursor-img', false);
       if (!raf) raf = requestAnimationFrame(tick);
     });
     document.addEventListener('mouseleave', function () { body.classList.remove('cursor-on'); });
+    // the page scrolls under a still mouse: re-check what is under the cursor so the label stays true
+    window.addEventListener('scroll', function () {
+      if (!body.classList.contains('cursor-on')) return;
+      var el = document.elementFromPoint(tx, ty);
+      var t = el && el.closest && el.closest('a, button');
+      var lab = t && (t.getAttribute('data-cursor') || (t.querySelector('img') ? 'Смотреть' : ''));
+      if (lab !== curLabel) { curLabel = lab; curText.textContent = lab || ''; }
+      body.classList.toggle('cursor-label', !!lab);
+      body.classList.toggle('cursor-link', !!t && !lab);
+    }, { passive: true });
     function tick() {
       cx += (tx - cx) * .18; cy += (ty - cy) * .18;
       cur.style.transform = 'translate(' + cx + 'px,' + cy + 'px) translate(-50%,-50%)';
       raf = (Math.abs(tx - cx) > .2 || Math.abs(ty - cy) > .2) ? requestAnimationFrame(tick) : null;
     }
   }
+
+  /* ---- works: the hairline above each project draws itself as it arrives ---- */
+  var works = document.querySelectorAll('.work');
+  if (works.length && 'IntersectionObserver' in window && !reduce) {
+    var wio = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('line-in'); wio.unobserve(e.target); } });
+    }, { threshold: .15 });
+    works.forEach(function (w) { wio.observe(w); });
+  } else works.forEach(function (w) { w.classList.add('line-in'); });
 
   /* ---- reveal on scroll ---- */
   var rev = document.querySelectorAll('[data-reveal]');
@@ -97,12 +119,18 @@
   var heroBirdG = heroBird && heroBird.querySelector('.mp-bird');
   var shelfItems = document.querySelectorAll('[data-drift]');
   var lastY = window.scrollY, ticking = false;
+  var darkBands = document.querySelectorAll('.band--dark, .contact');
   function onScroll() {
     var y = window.scrollY, vh = window.innerHeight;
     body.classList.toggle('scrolled', y > 260);
     if (bar) {
-      if (y > 120 && y > lastY + 4) bar.classList.add('hide');
-      else if (y < lastY - 4) bar.classList.remove('hide');
+      // the bar always stays; over the dark bands it turns dark
+      var mid = bar.getBoundingClientRect().height / 2, dark = false;
+      for (var di = 0; di < darkBands.length; di++) {
+        var dr = darkBands[di].getBoundingClientRect();
+        if (dr.top <= mid && dr.bottom >= mid) { dark = true; break; }
+      }
+      bar.classList.toggle('on-dark', dark && !body.classList.contains('menu-open'));
     }
     if (steps) {
       var r = steps.getBoundingClientRect();
@@ -132,30 +160,8 @@
   window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
   onScroll();
 
-  /* ---- take-off: damped, forward (toward the beak), on an arc ---- */
+  /* ---- hero magpie: arrives on the branch; flights to the logo live in assets/flight.js ---- */
   if (heroBirdG) { heroBirdG.addEventListener('animationend', function () { body.classList.add('arrived'); }); }
-  if (heroBirdG && !reduce) {
-    var fp = 0, ft = 0, flyRaf = null, wasFlying = false;
-    function flyTarget() {
-      var vh = window.innerHeight;
-      return Math.max(0, Math.min(1, (window.scrollY - 30) / (vh * .85)));
-    }
-    function flyTick() {
-      fp += (ft - fp) * .085;
-      var e = fp * fp * (3 - 2 * fp);              /* smoothstep */
-      var lift = Math.sin(Math.min(1, fp * 1.6) * Math.PI) * 90;   /* hop up at take-off */
-      var x = -e * 1500;                            /* forward: the bird faces left */
-      var yy = -e * 520 - lift;
-      var rot = -14 * Math.sin(e * Math.PI) - 6 * e + Math.sin(fp * 22) * 2.2 * (1 - e); /* bank, then level; faint wingbeat */
-      var sc = 1 + .12 * Math.sin(e * Math.PI) - .35 * e;
-      heroBirdG.style.transform = 'translate(' + x.toFixed(1) + 'px,' + yy.toFixed(1) + 'px) rotate(' + rot.toFixed(2) + 'deg) scale(' + sc.toFixed(3) + ')';
-      heroBirdG.style.opacity = e > .96 ? String(Math.max(0, 1 - (e - .96) * 25)) : '1';
-      var flying = fp > .015;
-      if (flying !== wasFlying) { body.classList.toggle('flying', flying); wasFlying = flying; }
-      if (Math.abs(ft - fp) > .0005) flyRaf = requestAnimationFrame(flyTick); else flyRaf = null;
-    }
-    window.addEventListener('scroll', function () { ft = flyTarget(); if (!flyRaf) flyRaf = requestAnimationFrame(flyTick); }, { passive: true });
-  }
 
   /* ---- landing: about-bird drops onto its branch ---- */
   var aboutBird = document.getElementById('aboutBird');
@@ -202,7 +208,11 @@
   if (copyBtn) {
     copyBtn.addEventListener('click', function () {
       var text = copyBtn.getAttribute('data-copy');
-      var done = function () { copyBtn.textContent = 'Скопировано'; setTimeout(function () { copyBtn.textContent = 'Скопировать'; }, 1800); };
+      var done = function () {
+        copyBtn.textContent = 'Скопировано'; copyBtn.setAttribute('data-cursor', 'Готово');
+        var c = document.querySelector('.cursor span'); if (c && body.classList.contains('cursor-label')) c.textContent = 'Готово';
+        setTimeout(function () { copyBtn.textContent = 'Скопировать'; copyBtn.setAttribute('data-cursor', 'Скопировать'); }, 1800);
+      };
       function select() {
         var a = document.querySelector('.mail a'); if (!a) return;
         var r = document.createRange(); r.selectNodeContents(a);
