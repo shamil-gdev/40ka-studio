@@ -323,9 +323,9 @@
 
 
   /* ---------- the magpie in the logo is alive ----------
-     A small procedural character: she pumps her tail like a real magpie, pecks at the branch,
-     shuffles along it, shakes her feathers, glances back, leans into the scroll and settles when it stops,
-     turns toward whatever the visitor points at (shiny pictures excite her) and is pleased by a click.
+     A small procedural character living on her own (she does not follow the mouse): every few seconds
+     she pumps her tail like a real magpie, pecks at the branch, steps along it, looks down, sits up or
+     shakes her feathers; she leans a little into the scroll and settles when it stops.
      The logo branch is a spring: it dips under her hops, she rides it, the leaves swing a beat later. */
   var alive = (function () {
     var stub = { face: function () { return 1; }, offset: function () { return [0, 0]; }, reset: function () {}, land: function () {}, launch: function () {} };
@@ -335,9 +335,8 @@
     var tail = null;
     if (tailPath) { tail = el('g', { 'class': 'mp-tailpivot' }); tailPath.parentNode.insertBefore(tail, tailPath); tail.appendChild(tailPath); }
     var leaves = M.leafList(markSvg).map(function (L) { L.s = 0; L.v = 0; return L; });
-    var fine = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     var FX = 198, FY = 207, TX = 296, TY = 78, BX = 3, BY = 213, SLOPE = -.044, PX = LOGO_W / VB_W;
-    var POS = [-34, -18, 0, 12, 22];
+    var POS = [-24, -12, 0, 10, 18];
 
     var S = { pos: 0, face: 1, tilt: 0, tiltT: 0, tiltV: 0, lean: 0, leanV: 0, tl: 0, tlV: 0, dip: 0, dipV: 0 };
     var G = null, Q = [], last = '', idleT = null, backT = null, raf = null, prev = null, manual = false, clock = 0;
@@ -400,7 +399,7 @@
         var c = POS.filter(function (p) { return Math.abs(p - S.pos) > 6; });
         if (Math.abs(S.pos) > 20) c = c.filter(function (p) { return Math.abs(p) < Math.abs(S.pos); });
         var to = c[Math.floor(Math.random() * c.length)], dx = to - S.pos;
-        return hop(dx, dx * S.face > 14);                                   // a long step backwards: turn round
+        return hop(dx, false, 16 + Math.abs(dx) * .3);                     // a small step along the branch
       },
       happy: function () { return { name: 'happy', dur: .9, fn: function (t, g) {
         var a = t < .3 ? Math.sin(Math.PI * t / .3) : t < .6 ? .7 * Math.sin(Math.PI * (t - .3) / .3) : 0;
@@ -413,7 +412,7 @@
         hit(g, t, .05, -10);
         return { sy: 1 - .12 * k, sx: 1 + .04 * k, y: 3 * k, r: -4 * k, tail: -14 * k - 14 * p }; } }; }
     };
-    var WEIGHTS = [['pump', .22], ['peck', .2], ['shuffle', .2], ['glance', .12], ['shake', .1], ['alert', .08], ['look', .08]];
+    var WEIGHTS = [['pump', .3], ['peck', .24], ['look', .16], ['shuffle', .14], ['alert', .1], ['shake', .06]];
     function pick() {
       var tot = 0, list = WEIGHTS.filter(function (w) { return w[0] !== last; });
       list.forEach(function (w) { tot += w[1]; });
@@ -430,16 +429,9 @@
     function act(name) { last = name; play(GEST[name]()); }
     function idle() {
       clearTimeout(idleT);
-      idleT = setTimeout(function () { if (on() && !G) act(pick()); idle(); }, rnd(2200, 5200));
+      idleT = setTimeout(function () { if (on() && !G) act(pick()); idle(); }, rnd(4500, 9000));
     }
     idle();
-
-    // turn to look at something; tilt < 0 looks down at the page
-    function turnTo(f, a) {
-      S.tiltT = a;
-      if (f !== S.face) play(hop(0, true, 14), true);
-      wake();
-    }
 
     /* ---- physics + render ---- */
     function springStep(x, v, target, f, z, dt) {
@@ -500,7 +492,7 @@
         wake();
         clearTimeout(stopT);
         stopT = setTimeout(function () {                                 // the page came to rest: so does she
-          if (on() && !G && travel > 900) act(Math.random() < .5 ? 'look' : 'pump');
+          if (on() && !G && travel > 900 && Math.random() < .4) act(Math.random() < .5 ? 'look' : 'pump');
           travel = 0;
         }, 260);
       }
@@ -509,34 +501,6 @@
     document.addEventListener('visibilitychange', function () {
       if (!document.hidden) setTimeout(function () { if (on()) { last = 'shake'; play(GEST.shake()); } }, 500);   // back to the tab: she wakes up
     });
-    document.addEventListener('click', function (e) {
-      var t = e.target.closest && e.target.closest('[data-copy], .chat__btn');
-      if (t && on()) { last = 'happy'; play(GEST.happy()); }
-    });
-    if (fine) {
-      markLink.addEventListener('pointerenter', function () { if (on() && !G) { last = 'duck'; play(GEST.duck()); } });
-      document.addEventListener('pointerover', function (e) {
-        if (!on()) return;
-        var t = e.target.closest && e.target.closest('a, button, [data-cursor]');
-        if (!t || t.closest('.mark')) return;
-        clearTimeout(backT);
-        var r = t.getBoundingClientRect(), b = markSvg.getBoundingClientRect();
-        var right = r.left + r.width / 2 > b.left + b.width / 2 + 30;
-        turnTo(right ? -1 : 1, r.top > b.bottom + 40 ? -7 : 0);
-        // pictures shine: she gets excited, once in a while per picture
-        if (t.querySelector('img') || t.classList.contains('glint')) {
-          var at = seen.get(t) || 0, now = performance.now();
-          if (now - at > 6000) { seen.set(t, now); play({ name: 'eager', dur: .65, fn: GEST.happy().fn }); }
-        }
-      });
-      document.addEventListener('pointerout', function (e) {
-        var t = e.target.closest && e.target.closest('a, button, [data-cursor]');
-        if (!t) return;
-        clearTimeout(backT);
-        backT = setTimeout(function () { if (on()) turnTo(1, 0); }, 1400);
-      });
-    }
-
     function clear() {
       G = null; Q.length = 0; clearTimeout(backT);
       S.pos = 0; S.face = 1; S.tilt = S.tiltT = S.tiltV = 0; S.lean = S.leanV = S.tl = S.tlV = 0; sv = 0;
