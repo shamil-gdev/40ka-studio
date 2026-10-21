@@ -73,13 +73,13 @@
     }
   }
 
-  /* ---- works: the hairline above each project draws itself as it arrives ---- */
+  /* ---- works: the rules of each label draw themselves as the label arrives ---- */
   var works = document.querySelectorAll('.work');
   if (works.length && 'IntersectionObserver' in window && !reduce) {
     var wio = new IntersectionObserver(function (es) {
-      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('line-in'); wio.unobserve(e.target); } });
-    }, { threshold: .15 });
-    works.forEach(function (w) { wio.observe(w); });
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.closest('.work').classList.add('line-in'); wio.unobserve(e.target); } });
+    }, { threshold: .6 });
+    works.forEach(function (w) { wio.observe(w.querySelector('.work__cap') || w); });
   } else works.forEach(function (w) { w.classList.add('line-in'); });
 
   /* ---- reveal on scroll ---- */

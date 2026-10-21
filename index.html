@@ -22,7 +22,7 @@
 <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400&family=Golos+Text:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400&family=Golos+Text:wght@400;500&family=IBM+Plex+Mono:wght@300;400&display=swap">
 <link rel="stylesheet" href="assets/site.css">
 
 </head>
@@ -131,56 +131,50 @@
       <p>Пять проектов, которые показывают, как мы думаем: от кофейни до университета, от Дагестана до Саудовской Аравии.</p>
     </div>
     <div class="works">
-      <a class="work work--left glint" href="cases/granada.html" data-cursor="Смотреть">
-        <figure data-reveal class="tilt"><img src="img/granada-street.jpg" alt="Вывеска Granada Coffee на улице"></figure>
-        <div class="work__info">
-          <span class="work__num">01</span>
-          <h3>Granada Coffee</h3>
-          <span class="meta">Кофейный бренд, Эр-Рияд</span>
-          <p class="task">Соединить андалузское наследие и арабскую букву в современный кофейный бренд для саудовского рынка.</p>
-          <span class="work__more">Смотреть кейс <i aria-hidden="true">→</i></span>
-        </div>
-      </a>
-      <a class="work work--right glint" href="cases/nota.html" data-cursor="Смотреть">
-        <figure data-reveal class="tilt"><img src="img/nota-sign.jpg" alt="Вывеска парфюмерного магазина Нота"></figure>
-        <div class="work__info">
-          <span class="work__num">02</span>
-          <h3>Нота</h3>
-          <span class="meta">Парфюмерия</span>
-          <p class="task">Знак, который читается как буква и как музыка, и выглядит как люкс.</p>
-          <span class="work__more">Смотреть кейс <i aria-hidden="true">→</i></span>
-        </div>
-      </a>
-      <a class="work work--left glint" href="cases/university.html" data-cursor="Смотреть">
-        <figure data-reveal class="tilt"><img src="img/uni-building.jpg" alt="Эмблема университета на фасаде"></figure>
-        <div class="work__info">
-          <span class="work__num">03</span>
-          <h3>Исламский университет им. Саидбега Даитова</h3>
-          <span class="meta">Образование, ребрендинг</span>
-          <p class="task">Эмблема, которая одинаково уместна на печати ректора, на фасаде и в соцсетях.</p>
-          <span class="work__more">Смотреть кейс <i aria-hidden="true">→</i></span>
-        </div>
-      </a>
-      <a class="work work--right glint" href="cases/kofio.html" data-cursor="Смотреть">
-        <figure data-reveal class="tilt"><img src="img/kofio-hero.jpg" alt="Интерьер кофейни Kofio"></figure>
-        <div class="work__info">
-          <span class="work__num">04</span>
-          <h3>Kofio</h3>
-          <span class="meta">Кофейня</span>
-          <p class="task">Бренд, который запоминается с одного взгляда на стакан в руке прохожего.</p>
-          <span class="work__more">Смотреть кейс <i aria-hidden="true">→</i></span>
-        </div>
-      </a>
-      <a class="work work--left glint" href="cases/mosaik.html" data-cursor="Смотреть">
-        <figure data-reveal class="tilt"><img src="img/mosaik-hero.jpg" alt="Плакат Mosaik Travel: твой кусочек Петры"></figure>
-        <div class="work__info">
-          <span class="work__num">05</span>
-          <h3>Mosaik Travel</h3>
-          <span class="meta">Туризм</span>
-          <p class="task">Простой символ для идеи «путешествие — это картина из множества ярких моментов».</p>
-          <span class="work__more">Смотреть кейс <i aria-hidden="true">→</i></span>
-        </div>
-      </a>
+      <div class="works__col">
+        <a class="work glint" href="cases/granada.html" data-cursor="Смотреть" style="order:1">
+          <figure data-reveal style="--ar:9 / 5"><img src="img/granada-hero.jpg" alt="Фасад кофейни Granada Coffee" style="object-position:50% 0%"></figure>
+          <div class="work__cap">
+            <h3 class="work__title">Granada Coffee<i aria-hidden="true">•</i><span>Эр-Рияд</span></h3>
+            <p class="work__row">Кофейный бренд</p>
+            <p class="work__row">Позиционирование, знак, паттерн, упаковка</p>
+          </div>
+        </a>
+        <a class="work glint" href="cases/university.html" data-cursor="Смотреть" style="order:3">
+          <figure data-reveal style="--ar:1 / 1"><img src="img/uni-building.jpg" alt="Эмблема университета на фасаде" style="object-position:28% 50%"></figure>
+          <div class="work__cap">
+            <h3 class="work__title">Исламский университет им. Саидбега Даитова<i aria-hidden="true">•</i><span>Хасавюрт</span></h3>
+            <p class="work__row">Образование, ребрендинг</p>
+            <p class="work__row">Эмблема, система логотипов, паттерн, носители</p>
+          </div>
+        </a>
+        <a class="work glint" href="cases/mosaik.html" data-cursor="Смотреть" style="order:5">
+          <figure data-reveal style="--ar:16 / 10"><img src="img/mosaik-hero.jpg" alt="Плакат Mosaik Travel: твой кусочек Петры" style="object-position:50% 50%"></figure>
+          <div class="work__cap">
+            <h3 class="work__title">Mosaik Travel<i aria-hidden="true">•</i><span>Россия</span></h3>
+            <p class="work__row">Туризм</p>
+            <p class="work__row">Платформа бренда, знак, паттерн, марки</p>
+          </div>
+        </a>
+      </div>
+      <div class="works__col">
+        <a class="work glint" href="cases/nota.html" data-cursor="Смотреть" style="order:2">
+          <figure data-reveal style="--ar:4 / 5"><img src="img/nota-sign.jpg" alt="Вывеска парфюмерного магазина Нота" style="object-position:50% 50%"></figure>
+          <div class="work__cap">
+            <h3 class="work__title">Нота<i aria-hidden="true">•</i><span>Россия</span></h3>
+            <p class="work__row">Парфюмерия, ретейл</p>
+            <p class="work__row">Знак, логотип, палитра, упаковка, вывеска</p>
+          </div>
+        </a>
+        <a class="work glint" href="cases/kofio.html" data-cursor="Смотреть" style="order:4">
+          <figure data-reveal style="--ar:4 / 5"><img src="img/kofio-hero.jpg" alt="Интерьер кофейни Kofio" style="object-position:50% 40%"></figure>
+          <div class="work__cap">
+            <h3 class="work__title">Kofio<i aria-hidden="true">•</i><span>Россия</span></h3>
+            <p class="work__row">Кофейня, HoReCa</p>
+            <p class="work__row">Знак, паттерны, посуда, вывеска, соцсети</p>
+          </div>
+        </a>
+      </div>
     </div>
   </section>
 
