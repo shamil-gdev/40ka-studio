@@ -261,7 +261,7 @@
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var force = !!window.INTRO_FORCE || /[?&]intro=(always|hold)\b/.test(location.search);
   var seen = false;
-  try { seen = sessionStorage.getItem('40ka-intro') === '1'; } catch (e) {}
+  try { seen = sessionStorage.getItem('40ka-intro') === '1' && !body.classList.contains('reloaded'); } catch (e) {}   // once per visit; a reload shows it again
 
   function startPage() { body.classList.remove('intro-wait'); body.classList.add('bird-ready'); }
   if (!intro || !hero || reduce || (seen && !force)) {
