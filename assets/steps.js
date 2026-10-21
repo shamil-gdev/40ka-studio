@@ -87,6 +87,27 @@
     } else mob.forEach(function (s) { Array.prototype.forEach.call(s.querySelectorAll('path'), function (p) { p.style.strokeDashoffset = 0; }); });
   }
 
+  /* for the magpie (flight.js): where the line is on screen, so she can stand on it and walk behind the pen */
+  window.__steps = {
+    mode: function () { return desk ? 'desk' : (mob.length ? 'mob' : null); },
+    progress: function () { return reduce ? 1 : progress(); },
+    rect: function () { return steps.getBoundingClientRect(); },
+    // desktop: a point on the drawn line at fraction p (0..1), in screen px
+    at: function (p) {
+      if (!desk) return null;
+      var r = desk.main.ownerSVGElement.getBoundingClientRect(), pt = desk.main.getPointAtLength(desk.L * Math.max(0, Math.min(1, p)));
+      return [r.left + pt.x, r.top + pt.y + 12];
+    },
+    length: function () { return desk ? desk.w : 0; },
+    // phones: a point on the line of step i (fraction f along it)
+    stepAt: function (i, f) {
+      var s = mob[i]; if (!s) return null;
+      var path = s.querySelector('path'), r = s.getBoundingClientRect(), L = path.getTotalLength(), pt = path.getPointAtLength(L * (f == null ? .16 : f));
+      return [r.left + pt.x, r.top + pt.y + 8];
+    },
+    count: function () { return mob.length; }
+  };
+
   var mq = window.matchMedia('(max-width: 900px)');
   function build() {
     if (mq.matches) { holder.innerHTML = ''; desk = null; buildMob(); }

@@ -103,6 +103,49 @@
     return { g: g, arm: arm, hand: hand, sheen: sheen };
   }
 
+  /* ---------- legs ----------
+     Each leg: hip (hidden in the belly) -> heel (bends backwards, towards the tail) -> ankle, plus two toes.
+     At rest the heel sits halfway, so the leg is the straight line of the drawing.
+     st.legRot (-60 tucked .. 0 .. 22 reaching forward) and st.legS (squash) keep their old meaning;
+     st.plant (0..1) keeps the feet where they stand on the branch while the body moves; st.toe curls the toes. */
+  var LEGS = [
+    { hip: [199.4, 151.6], ankle: [203.5, 200.2], toeB: [14, 5.9], toeF: [-10, 7.9] },
+    { hip: [173.5, 151.0], ankle: [167.5, 202.2], toeB: [10, 7.9], toeF: [-14, 5.9] }
+  ];
+  LEGS.forEach(function (L) { L.len = Math.hypot(L.ankle[0] - L.hip[0], L.ankle[1] - L.hip[1]); });
+  function rotP(p, c, deg) {
+    var a = deg * Math.PI / 180, x = p[0] - c[0], y = p[1] - c[1];
+    return [c[0] + x * Math.cos(a) - y * Math.sin(a), c[1] + x * Math.sin(a) + y * Math.cos(a)];
+  }
+  function rotV(v, deg, k) {
+    var a = deg * Math.PI / 180;
+    return [(v[0] * Math.cos(a) - v[1] * Math.sin(a)) * k, (v[0] * Math.sin(a) + v[1] * Math.cos(a)) * k];
+  }
+  function legPath(st) {
+    var lr = st.legRot || 0, tuck = clamp(-lr / 60, 0, 1), reach = clamp(lr / 22, 0, 1);
+    var squash = 1 - (st.legS == null ? 1 : st.legS);
+    var plant = st.plant || 0, toe = st.toe == null ? 0 : st.toe;
+    var f = (st.toe == null) ? Math.max(tuck, 0) : toe;              // tucked legs curl their toes
+    var d = '';
+    LEGS.forEach(function (L) {
+      var H = L.hip, A0 = L.ankle;
+      // where the foot goes when it is free: folded up under the belly, or reaching forward for the perch
+      var At = [H[0] + 20, H[1] + 17], Ar = [H[0] - 15, H[1] + L.len * .93];
+      var free = [A0[0] + (At[0] - A0[0]) * tuck + (Ar[0] - A0[0]) * reach, A0[1] + (At[1] - A0[1]) * tuck + (Ar[1] - A0[1]) * reach - squash * 30];
+      // where it stays when planted: the drawn foot position, seen from inside the moving body
+      var P = rotP(A0, C, -(st.rot || 0)); P[1] -= (st.bob || 0);
+      var A = [free[0] + (P[0] - free[0]) * plant, free[1] + (P[1] - free[1]) * plant];
+      var dx = A[0] - H[0], dy = A[1] - H[1], dd = Math.hypot(dx, dy) || 1, l = L.len / 2;
+      if (dd > 2 * l) { A = [H[0] + dx / dd * 2 * l, H[1] + dy / dd * 2 * l]; dx = A[0] - H[0]; dy = A[1] - H[1]; dd = 2 * l; }
+      var ca = clamp(dd / (2 * l), -1, 1), sa = Math.sqrt(1 - ca * ca);
+      var K = [H[0] + dx / 2 + (dy / dd) * l * sa, H[1] + dy / 2 - (dx / dd) * l * sa];   // heel bends backwards (+x)
+      var tb = rotV(L.toeB, 52 * f, 1 - .15 * f), tf = rotV(L.toeF, -48 * f, 1 - .15 * f);
+      var p = function (x) { return x[0].toFixed(1) + ',' + x[1].toFixed(1); };
+      d += 'M' + p(H) + 'L' + p(K) + 'L' + p(A) + 'M' + p(A) + 'l' + p(tb) + 'M' + p(A) + 'l' + p(tf);
+    });
+    return d;
+  }
+
   /* source: the hero magpie already on the page, so the intro bird is the same drawing */
   function buildRig(parent, src, opts) {
     opts = opts || {};
@@ -124,7 +167,7 @@
     el('path', { d: tailD, fill: 'var(--ink,#000)' }, tailG);
 
     var legsG = el('g', {}, bob);
-    var legs = el('path', { d: q('.mp-legs').getAttribute('d'), fill: 'none', stroke: 'var(--ink,#000)', 'stroke-width': 4, 'stroke-linecap': 'round' }, legsG);
+    var legs = el('path', { d: q('.mp-legs').getAttribute('d'), fill: 'none', stroke: 'var(--ink,#000)', 'stroke-width': 4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, legsG);
 
     var bodyD = q('.mp-body:not(.mp-tail)').getAttribute('d');
     var bodyClipD = q('clipPath path').getAttribute('d');
@@ -178,7 +221,9 @@
         else blurWrap.removeAttribute('filter');
         pose.setAttribute('transform', 'rotate(' + st.rot.toFixed(2) + ' ' + C[0] + ' ' + C[1] + ')');
         bob.setAttribute('transform', 'translate(0 ' + (st.bob || 0).toFixed(2) + ')');
-        head.setAttribute('transform', 'rotate(' + (st.head || 0).toFixed(2) + ' ' + NECK[0] + ' ' + NECK[1] + ')');
+        // the head keeps still while the body pitches and bobs (headLock 0..1), the way birds hold their gaze
+        var lock = st.headLock || 0;
+        head.setAttribute('transform', 'translate(0 ' + (-lock * .8 * (st.bob || 0)).toFixed(2) + ') rotate(' + ((st.head || 0) - lock * st.rot).toFixed(2) + ' ' + NECK[0] + ' ' + NECK[1] + ')');
         pupil.setAttribute('cx', (102.5 + (st.pdx || 0)).toFixed(2));
         pupil.setAttribute('cy', (34.1 + (st.pdy || 0)).toFixed(2));
         lid.setAttribute('transform', 'translate(0 ' + (28.6 * (1 - (st.blink || 0))).toFixed(2) + ') scale(1 ' + (st.blink || 0).toFixed(3) + ')');
@@ -188,7 +233,7 @@
           n.setAttribute('transform', 'rotate(' + a.toFixed(2) + ' ' + TAIL[0] + ' ' + TAIL[1] + ')');
           n.setAttribute('opacity', (st.fan || 0) > .02 ? 1 : 0);
         });
-        legsG.setAttribute('transform', 'rotate(' + (st.legRot || 0).toFixed(2) + ' ' + HIPS[0] + ' ' + HIPS[1] + ') translate(' + HIPS[0] + ' ' + HIPS[1] + ') scale(1 ' + (st.legS == null ? 1 : st.legS).toFixed(3) + ') translate(' + (-HIPS[0]) + ' ' + (-HIPS[1]) + ')');
+        legs.setAttribute('d', legPath(st));
         legsG.setAttribute('opacity', st.legOp == null ? 1 : st.legOp.toFixed(3));
         var pk = st.patch == null ? 1 : st.patch;
         patchG.setAttribute('opacity', pk > .001 ? 1 : 0);
@@ -247,24 +292,36 @@
     } };
   }
 
-  /* ---------- wingbeat ---------- */
-  // u: phase 0..1 (0 = top of the stroke). Downstroke 0..0.55, upstroke 0.55..1.
-  function flapPose(u, amp) {
+  /* ---------- wingbeat ----------
+     u: phase 0..1 (0 = top of the stroke). The downstroke is quicker and stronger (0..0.44),
+     the upstroke slower; the hand trails the arm: still bent back as the arm starts down,
+     overshooting at the bottom, folding up during the recovery. i: beat number, so no two beats are identical. */
+  function curve(pts, u) {
+    // closed Catmull-Rom through (u, value) keys; the last key must equal the first at u = 1
+    for (var k = 0; k < pts.length - 1; k++) if (u <= pts[k + 1][0]) break;
+    var p1 = pts[k], p2 = pts[k + 1], p0 = pts[k - 1] || [pts[pts.length - 2][0] - 1, pts[pts.length - 2][1]], p3 = pts[k + 2] || [pts[1][0] + 1, pts[1][1]];
+    var t = (u - p1[0]) / ((p2[0] - p1[0]) || 1), t2 = t * t, t3 = t2 * t;
+    return .5 * ((2 * p1[1]) + (-p0[1] + p2[1]) * t + (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2 + (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3);
+  }
+  var FLAP_P = [[0, 1], [.1, .78], [.24, .05], [.36, -.48], [.44, -.58], [.56, -.4], [.72, .25], [.88, .85], [1, 1]];
+  var FLAP_TH = [[0, 14], [.22, 0], [.44, -17], [.6, -12], [.8, 4], [1, 14]];
+  var FLAP_FLEX = [[0, 16], [.12, 4], [.3, -7], [.44, -14], [.54, 18], [.66, 56], [.84, 42], [1, 16]];
+  function flapPose(u, amp, i) {
     amp = amp == null ? 1 : amp;
-    var p, th, flex;
-    if (u < .55) {                       // downstroke: wing sweeps from up-back to down-front, fully spread
-      var k = eio(u / .55);
-      p = lerp(1, -.55, k); th = lerp(14, -16, k); flex = lerp(10, -4, k);
-    } else {                             // upstroke: wrist flexes, wing comes up folded and returns back
-      var k2 = (u - .55) / .45, e = eio(k2);
-      p = lerp(-.55, 1, e); th = lerp(-16, 14, e);
-      flex = -4 + 62 * Math.sin(Math.PI * Math.min(1, k2 * 1.08));
-    }
+    u = ((u % 1) + 1) % 1;
+    var v = i == null ? 0 : (Math.sin(i * 2.39 + .6) * .5 + Math.sin(i * 5.1) * .5);
+    var a = amp * (1 + .07 * v);
+    var p = curve(FLAP_P, u), th = curve(FLAP_TH, u) + 2 * v, flex = curve(FLAP_FLEX, u);
     var glideP = .82, glideTh = 6, glideFlex = 8;
-    return { p: lerp(glideP, p, amp), th: lerp(glideTh, th, amp), flex: lerp(glideFlex, flex, amp) };
+    return { p: lerp(glideP, p, Math.min(a, 1.07)), th: lerp(glideTh, th, a), flex: lerp(glideFlex, flex, a) };
+  }
+  // body bob that goes with the beat: the body rises on the downstroke and sinks during the recovery
+  function flapBob(u, amp) {
+    u = ((u % 1) + 1) % 1;
+    return amp * (u < .44 ? -4.6 * Math.sin(Math.PI * u / .44) : 2.4 * Math.sin(Math.PI * (u - .44) / .56));
   }
 
-  window.MagpieIntro = { buildRig: buildRig, flapPose: flapPose, el: el, C: C, swayLeaves: swayLeaves, cloneLeaves: cloneLeaves, leafList: leafList, branchBend: branchBend, branchReach: branchReach,
+  window.MagpieIntro = { buildRig: buildRig, flapPose: flapPose, flapBob: flapBob, el: el, C: C, swayLeaves: swayLeaves, cloneLeaves: cloneLeaves, leafList: leafList, branchBend: branchBend, branchReach: branchReach,
     util: { clamp: clamp, lerp: lerp, seg: seg, sm: sm, eio: eio, eo: eo, ei: ei, backOut: backOut, bez: bez, spring: spring, wobble: wobble } };
 
   /* =====================================================================
@@ -394,17 +451,18 @@
 
   /* ---------- wingbeat clock ---------- */
   function beatPhase(t) {
+    function b(t0, per, base) { var n = Math.max(0, (t - t0) / per); return { u: n % 1, amp: 1, i: base + Math.floor(n) }; }
     if (L.mode === 'A') {
       // steady beats across the page; a short glide at the top of the arc; braking beats into the perch
       // whole cycles only, so the phase never jumps: 2 beats, glide, 1 beat, 2 braking beats
-      if (t < T.cruise) return { u: ((t - T.enter) / .22) % 1, amp: 1 };
-      if (t < T.glideEnd) return { u: 0, amp: 0 };
-      if (t < T.brake) return { u: ((t - T.glideEnd) / .2) % 1, amp: 1 };
-      return { u: ((t - T.brake) / .16) % 1, amp: 1 };
+      if (t < T.cruise) return b(T.enter, .22, 0);
+      if (t < T.glideEnd) return { u: 0, amp: 0, i: 2 };
+      if (t < T.brake) return b(T.glideEnd, .2, 3);
+      return b(T.brake, .16, 5);
     }
-    if (t < T.dive) return { u: ((t - T.enter) / .19) % 1, amp: 1 };
-    if (t < T.brake) return { u: 0, amp: 0 };
-    return { u: ((t - T.brake) / .16) % 1, amp: 1 };
+    if (t < T.dive) return b(T.enter, .19, 0);
+    if (t < T.brake) return { u: 0, amp: 0, i: 4 };
+    return b(T.brake, .16, 5);
   }
   function ampAt(t) {
     if (L.mode === 'A') {
@@ -416,6 +474,18 @@
     return a;
   }
 
+  function pitchAt(t) {
+    var A = L.mode === 'A';
+    var Pb = posAt(t - 1 / 60), Pf = posAt(t + 1 / 60);
+    var dx = Pf[0] - Pb[0], dy = Pf[1] - Pb[1], v = Math.hypot(dx, dy) * 30;
+    var face = A ? (t >= T.turn && seg(t, T.turn, T.turnEnd) >= .5 ? 1 : -1) : 1;
+    var dirAng = v > 1 ? Math.atan2(-dy, -face * dx) * 180 / Math.PI : 0;
+    var pitch = clamp(dirAng, -38, 30) * .75;
+    pitch = lerp(pitch, 24, sm(seg(t, T.brake + .05, T.contact - .04)));
+    if (t >= T.contact) pitch = 24 * (1 - spring(t - T.contact, 2.1, .42));
+    if (A && t >= T.turn) pitch += 8 * Math.sin(Math.PI * seg(t, T.turn, T.turnEnd)) + 4 * wobble(t - T.turnEnd, 2.6, 7);
+    return pitch;
+  }
   function state(t) {
     var st = { s: L.s1, rot: 0, bob: 0, head: 0, tail: 0, fan: 0, legRot: -60, legS: .4, legOp: 0, patch: 0, blink: 0, pdx: 0, pdy: 0, blur: 0, blurAng: 0, blurNode: blurNode, flip: 1, hop: 0 };
     var A = L.mode === 'A';
@@ -436,22 +506,15 @@
     } else st.flip = face;
 
     // pitch (nose-up +) follows the flight direction, then the flare lifts the nose
-    var dirAng = v > 1 ? Math.atan2(-dy, -face * dx) * 180 / Math.PI : 0;
-    var pitch = clamp(dirAng, -38, 30) * .75;
     var flare = sm(seg(t, T.brake + .05, T.contact - .04));
-    pitch = lerp(pitch, 24, flare);
-    if (t >= T.contact) {
-      var tc = t - T.contact;
-      pitch = 24 * (1 - spring(tc, 2.1, .42));
-      st.bob = 9 * wobble(tc, 2.4, 5.5) * (tc < .05 ? tc / .05 : 1);
-    }
-    if (A && t >= T.turn) pitch += 8 * Math.sin(Math.PI * seg(t, T.turn, T.turnEnd)) + 4 * wobble(t - T.turnEnd, 2.6, 7);
-    st.rot = pitch;
+    st.rot = pitchAt(t);
+    if (t >= T.contact) { var tc = t - T.contact; st.bob = 9 * wobble(tc, 2.4, 5.5) * (tc < .05 ? tc / .05 : 1); }
+    st.headLock = t < T.contact ? .6 : .72;
 
     // wings
     var bp = beatPhase(t), amp = ampAt(t), w;
     if (t < T.flare) {
-      w = flapPose(bp.u, amp);
+      w = flapPose(bp.u, amp, bp.i);
       if (!A && t >= T.dive - .06 && t < T.brake + .06) {
         var tuck = sm(seg(t, T.dive - .04, T.dive + .1)) * (1 - sm(seg(t, T.brake - .06, T.brake + .04)));
         w = { p: lerp(w.p, .5, tuck), th: lerp(w.th, 34, tuck), flex: lerp(w.flex, 46, tuck), c: lerp(1, .82, tuck) };
@@ -460,16 +523,17 @@
         var fwd = sm(seg(t, T.brake, T.brake + .2));
         w.th = w.th - 22 * fwd; w.flex = Math.min(w.flex, 30);
       }
-      if (amp > .01 && t < T.brake) {
-        st.bob += amp * (bp.u < .55 ? -4.5 * Math.sin(Math.PI * bp.u / .55) : 2.6 * Math.sin(Math.PI * (bp.u - .55) / .45));
-      }
+      if (amp > .01 && t < T.brake) st.bob += flapBob(bp.u, amp);
     } else if (t < T.contact + .1) {
       var hold = sm(seg(t, T.flare, T.flare + .08));
-      var pre = flapPose(beatPhase(T.flare).u, 1);
+      var bpF = beatPhase(T.flare), pre = flapPose(bpF.u, 1, bpF.i);
       w = { p: lerp(pre.p, .97, hold), th: lerp(-26, -10, sm(seg(t, T.contact, T.contact + .1))), flex: -6 };
     } else {
       var f1 = eio(seg(t, T.contact + .1, T.fold1 + .06)), f2 = eio(seg(t, T.fold2 - .02, T.foldEnd));
       w = { p: lerp(lerp(.97, .85, f1), .36, f2), th: lerp(lerp(-10, 52, f1), 98, f2), flex: lerp(lerp(-6, 24, f1), 10, f2), c: lerp(lerp(1, .8, f1), .38, f2) };
+      // she finds her balance: a quick small flutter of the half-open wings before they fold away
+      var bal = wobble(t - T.contact - .06, 6.5, 8) * (1 - f2);
+      w.p += .2 * bal; w.th += 9 * bal; w.flex += 8 * bal;
       st.patch = eo(seg(t, T.foldEnd - .1, T.foldEnd + .02));
       w.op = st.patch > .55 ? 0 : 1;
       if (A && t >= T.turn - .04 && t < T.turnEnd + .08) {
@@ -486,10 +550,11 @@
     st.wf = { p: w.p * .9, th: w.th - 7, flex: w.flex, c: w.c, op: w.op, sheen: 0 };
 
     // tail: rudder in flight, fanned brake, flicks after landing and after the turn
-    var tailFlight = -3 * Math.sin(2 * Math.PI * (beatPhase(t).u + .25)) * (t < T.brake ? amp : 0);
+    var tailFlight = -3.6 * Math.sin(2 * Math.PI * (beatPhase(t).u + .25 - .12)) * (t < T.brake ? amp : 0);
     st.tail = tailFlight + 20 * flare * (t < T.contact ? 1 : 1 - sm(seg(t, T.contact, T.contact + .22)));
     st.fan = t < T.contact ? flare : 1 - sm(seg(t, T.contact + .05, T.contact + .3));
     if (t >= T.contact) st.tail += -14 * wobble(t - T.contact - .04, 2.6, 5) + -11 * wobble(t - (A ? T.turnEnd : T.look), 3.2, 7);
+    st.tail += .5 * (pitchAt(t - .09) - st.rot) * (1 - sm(seg(t, T.end - .45, T.end - .15)));   // follow-through: the tail trails the body
 
     // legs
     st.legOp = sm(seg(t, T.legs - .04, T.legs + .06));
@@ -497,6 +562,11 @@
     st.legRot = lerp(-60, 22, lf); st.legS = lerp(.4, 1, lf);
     if (t >= T.contact - .06) { st.legRot = lerp(22, 0, sm(seg(t, T.contact - .06, T.contact + .04))); st.legS = 1; }
     if (t >= T.contact) st.legS = 1 - .06 * wobble(t - T.contact, 2.4, 6) - (A ? .1 * Math.sin(Math.PI * seg(t, T.turn - .05, T.turn + .05)) : 0);
+    st.plant = sm(seg(t, T.contact - .03, T.contact + .02));
+    if (A && t >= T.turn - .06 && t < T.turnEnd + .06) st.plant *= 1 - Math.sin(Math.PI * seg(t, T.turn - .06, T.turnEnd + .06));
+    var spread = sm(seg(t, T.legs, T.contact - .1)) * (1 - sm(seg(t, T.contact - .04, T.contact + .02)));
+    var grip = sm(seg(t, T.contact - .02, T.contact + .04)) * (1 - sm(seg(t, T.contact + .25, T.foldEnd)));
+    st.toe = t < T.legs ? 1 : (1 - sm(seg(t, T.legs, T.legs + .12))) - .3 * spread + .28 * grip;
 
     // head & eye: steady in flight, notices the glint, looks at it from the branch
     var exL = C[0] + face * (101 - C[0]);                         // eye x in rig space after facing
