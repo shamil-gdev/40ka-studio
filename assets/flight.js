@@ -223,7 +223,7 @@
   /* ---------- branch and leaves on the page ---------- */
   function setBranch(bendAt, t) {
     var b = bendAt(t);
-    heroBranch.setAttribute('transform', 'translate(0 ' + b.toFixed(2) + ')');
+    heroBranch.setAttribute('transform', M.branchBend(heroBranch, b));
     M.swayLeaves(heroLeaves, bendAt, t, 0);
   }
   function restBranch() {
