@@ -417,11 +417,12 @@ body.intro-wait .shelf a { animation-play-state: paused; }
 .contact { position: relative; background: var(--ink); color: var(--white); overflow: hidden; isolation: isolate; }
 .contact .wrap { position: relative; z-index: 1; padding-block: clamp(64px, 9vw, 140px); }
 /* magpie-feather sheen drifting in the dark */
-.sheen { position: absolute; inset: -20%; z-index: 0; pointer-events: none; filter: blur(70px); opacity: .55; }
-.sheen i { position: absolute; border-radius: 50%; width: 46vw; height: 46vw; max-width: 720px; max-height: 720px; mix-blend-mode: screen; }
-.sheen i:nth-child(1) { background: radial-gradient(circle, var(--sheen-1), transparent 65%); left: 5%; top: 10%; animation: drift1 18s ease-in-out infinite alternate; }
-.sheen i:nth-child(2) { background: radial-gradient(circle, var(--sheen-2), transparent 65%); right: 0%; top: 30%; animation: drift2 22s ease-in-out infinite alternate; }
-.sheen i:nth-child(3) { background: radial-gradient(circle, var(--sheen-3), transparent 65%); left: 40%; bottom: -10%; animation: drift3 26s ease-in-out infinite alternate; }
+/* no filter or blend modes here: soft gradients that only move (transform), so the GPU composites them for free */
+.sheen { position: absolute; inset: -20%; z-index: 0; pointer-events: none; }
+.sheen i { position: absolute; border-radius: 50%; width: 60vw; height: 60vw; max-width: 940px; max-height: 940px; opacity: .5; will-change: transform; }
+.sheen i:nth-child(1) { background: radial-gradient(circle closest-side, rgba(95, 211, 196, .9), rgba(95, 211, 196, .55) 28%, rgba(95, 211, 196, .22) 56%, rgba(95, 211, 196, .06) 80%, rgba(95, 211, 196, 0)); left: 5%; top: 10%; animation: drift1 18s ease-in-out infinite alternate; }
+.sheen i:nth-child(2) { background: radial-gradient(circle closest-side, rgba(106, 124, 255, .9), rgba(106, 124, 255, .55) 28%, rgba(106, 124, 255, .22) 56%, rgba(106, 124, 255, .06) 80%, rgba(106, 124, 255, 0)); right: 0%; top: 30%; animation: drift2 22s ease-in-out infinite alternate; }
+.sheen i:nth-child(3) { background: radial-gradient(circle closest-side, rgba(180, 140, 255, .9), rgba(180, 140, 255, .55) 28%, rgba(180, 140, 255, .22) 56%, rgba(180, 140, 255, .06) 80%, rgba(180, 140, 255, 0)); left: 40%; bottom: -10%; animation: drift3 26s ease-in-out infinite alternate; }
 @keyframes drift1 { to { transform: translate(18vw, 14vh) scale(1.15) } }
 @keyframes drift2 { to { transform: translate(-16vw, -10vh) scale(.9) } }
 @keyframes drift3 { to { transform: translate(-10vw, -18vh) scale(1.2) } }
