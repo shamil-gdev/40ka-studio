@@ -154,6 +154,7 @@ body.menu-open .menu__links a:nth-child(2) { transition-delay: .06s } body.menu-
 body.menu-open { overflow: hidden; }
 body.menu-open .bar { z-index: 72; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; transform: none; }
 body.menu-open .mark { color: var(--white); --mp-white: var(--ink); position: relative; z-index: 71; }
+body.menu-open .mark__bird { color: var(--white); --mp-white: var(--ink); }
 body.menu-open .mark__bird .mp-white, body.menu-open .mark__bird .mp-eye { fill: var(--ink); }
 body.menu-open .lang { opacity: 0; }
 @media (max-width: 760px) {
@@ -323,17 +324,21 @@ body.intro-wait .shelf a { animation-play-state: paused; }
 .work:hover img { transform: scale(1.035); }
 .work__cap { padding-top: 18px; }
 .work__title { font: 500 19px/1.3 var(--font-body); text-transform: uppercase; letter-spacing: .04em; padding-bottom: 13px; text-wrap: balance; }
-.work__title i { font-style: normal; display: inline-block; margin: 0 .45em; transform: translateY(-.04em); }
+.work__title i { font-style: normal; display: inline-block; margin: 0 .3em 0 .15em; transform: translateY(-.04em); }
 .work__row { position: relative; font: 300 17px/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: .01em; color: var(--ink); padding: 11px 0 12px; }
 .work__row::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1.5px; background: var(--ink); transform: scaleX(0); transform-origin: left; transition: transform 1.2s var(--ease); }
 .work__row + .work__row::before { transition-delay: .14s; }
 .work.line-in .work__row::before { transform: none; }
 .work:hover .work__title span { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: .22em; }
 @media (max-width: 760px) {
-  .works { grid-template-columns: 1fr; row-gap: 64px; }
-  .works__col { display: contents; }
-  .work__title { font-size: 16px; }
-  .work__row { font-size: 14.5px; }
+  /* phones keep the two columns: smaller labels, same wall */
+  .works { column-gap: 18px; }
+  .works__col { row-gap: 44px; }
+  .work__cap { padding-top: 10px; }
+  .work__title { font-size: 12px; letter-spacing: .03em; line-height: 1.3; padding-bottom: 7px; }
+  .work__title i { margin: 0 .2em 0 .1em; }
+  .work__row { font-size: 10.5px; line-height: 1.35; letter-spacing: 0; padding: 6px 0 7px; }
+  .work__row::before { height: 1px; }
 }
 
 /* ---------- services: three rows ---------- */
