@@ -3,6 +3,9 @@
   var html = document.documentElement;
   html.classList.add('js');
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // the few words the scripts write themselves (the pages are translated as static files, see tools/build_en.py)
+  var EN = html.lang === 'en';
+  var W = EN ? { view: 'View', copied: 'Copied', done: 'Done', copy: 'Copy' } : { view: 'Смотреть', copied: 'Скопировано', done: 'Готово', copy: 'Скопировать' };
 
   /* ---- second and later pages of a visit: no grand entrances, everything is already in place.
      A reload is a fresh start: the visitor asked to see the page again, so it arrives in full (intro included). ---- */
@@ -62,7 +65,7 @@
       if (!body.classList.contains('cursor-on')) { cx = tx; cy = ty; body.classList.add('cursor-on'); }
       var t = e.target.closest && e.target.closest('a, button');
       // a label inside the cursor says what a click will do: data-cursor, or "Смотреть" over a picture link
-      var lab = t && (t.getAttribute('data-cursor') || (t.querySelector('img') ? 'Смотреть' : ''));
+      var lab = t && (t.getAttribute('data-cursor') || (t.querySelector('img') ? W.view : ''));
       if (lab !== curLabel) { curLabel = lab; curText.textContent = lab || ''; }
       body.classList.toggle('cursor-label', !!lab);
       body.classList.toggle('cursor-link', !!t && !lab);
@@ -75,7 +78,7 @@
       if (!body.classList.contains('cursor-on')) return;
       var el = document.elementFromPoint(tx, ty);
       var t = el && el.closest && el.closest('a, button');
-      var lab = t && (t.getAttribute('data-cursor') || (t.querySelector('img') ? 'Смотреть' : ''));
+      var lab = t && (t.getAttribute('data-cursor') || (t.querySelector('img') ? W.view : ''));
       if (lab !== curLabel) { curLabel = lab; curText.textContent = lab || ''; }
       body.classList.toggle('cursor-label', !!lab);
       body.classList.toggle('cursor-link', !!t && !lab);
@@ -244,15 +247,23 @@
     window.addEventListener('resize', function () { if (window.innerWidth > 760) setMenu(false); });
   }
 
+  /* ---- RU / EN: the other language opens at the same section ---- */
+  var langA = document.querySelector('.lang a');
+  if (langA) langA.addEventListener('click', function () {
+    var secs = document.querySelectorAll('main section[id], section.contact'), mid = window.innerHeight * .4, id = '';
+    for (var i = 0; i < secs.length; i++) { var r = secs[i].getBoundingClientRect(); if (r.top <= mid && r.bottom > mid) id = secs[i].id; }
+    if (id && window.scrollY > 200) langA.setAttribute('href', langA.getAttribute('href').split('#')[0] + '#' + id);
+  });
+
   /* ---- copy email ---- */
   var copyBtn = document.querySelector('[data-copy]');
   if (copyBtn) {
     copyBtn.addEventListener('click', function () {
       var text = copyBtn.getAttribute('data-copy');
       var done = function () {
-        copyBtn.textContent = 'Скопировано'; copyBtn.setAttribute('data-cursor', 'Готово');
-        var c = document.querySelector('.cursor span'); if (c && body.classList.contains('cursor-label')) c.textContent = 'Готово';
-        setTimeout(function () { copyBtn.textContent = 'Скопировать'; copyBtn.setAttribute('data-cursor', 'Скопировать'); }, 1800);
+        copyBtn.textContent = W.copied; copyBtn.setAttribute('data-cursor', W.done);
+        var c = document.querySelector('.cursor span'); if (c && body.classList.contains('cursor-label')) c.textContent = W.done;
+        setTimeout(function () { copyBtn.textContent = W.copy; copyBtn.setAttribute('data-cursor', W.copy); }, 1800);
       };
       function select() {
         var a = document.querySelector('.mail a'); if (!a) return;
