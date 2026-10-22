@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>40ka · Детали: варианты</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400&family=Golos+Text:wght@400;500&family=IBM+Plex+Mono:wght@300;400&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+/* ---------- lab chrome (not part of any variant) ---------- */
+.lab-bar { position: fixed; inset: 0 0 auto 0; z-index: 50; height: 56px; display: flex; align-items: center; gap: 18px; padding-inline: var(--gutter) var(--gutter-r);
+  background: color-mix(in srgb, var(--bg) 88%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
+  font: 400 12px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; }
+.lab-bar nav { display: flex; gap: 14px; margin-left: auto; }
+.lab-bar a { color: var(--ink-soft); } .lab-bar a:hover { color: var(--ink); }
+.lab-intro { padding-top: 110px; padding-bottom: 20px; }
+.lab-intro h1 { font: 400 clamp(26px, 4vw, 52px)/1.05 var(--font-display); letter-spacing: -.02em; }
+.lab-intro p { margin-top: 14px; color: var(--ink-soft); max-width: 60ch; font-size: 16px; }
+.lab-tag { margin-top: clamp(56px, 8vw, 120px); padding-top: 18px; border-top: 1px solid var(--ink); display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap;
+  font: 300 12px/1.5 var(--font-mono); text-transform: uppercase; letter-spacing: .03em; color: var(--ink-soft); }
+.lab-tag b { font-weight: 400; color: var(--ink); }
+section[id] { scroll-margin-top: 56px; }
+.lab-end { padding: 120px 0 80px; color: var(--ink-soft); font: 300 12px/1.5 var(--font-mono); text-transform: uppercase; }
+
+/* shared heading look (same as the site's section heads) */
+.dh2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(26px, 3.2vw, 46px); line-height: 1.05; letter-spacing: -.02em; }
+.dlead { color: var(--ink-soft); max-width: 46ch; font-size: 16px; line-height: 1.5; }
+.mono { font: 300 12px/1.3 var(--font-mono); text-transform: uppercase; letter-spacing: .03em; }
+
+/* =========================================================
+   A — «Гнездо»: a pile of prints; the top one is flicked to the bottom
+   ========================================================= */
+.dA { padding-block: clamp(40px, 6vw, 96px) clamp(48px, 7vw, 110px); overflow: hidden; }
+.dA__grid { display: grid; grid-template-columns: 5fr 7fr; column-gap: clamp(40px, 6vw, 110px); align-items: center; }
+.dA__side .dlead { margin-top: 18px; }
+.dA__list { list-style: none; margin: 34px 0 0; padding: 0; border-bottom: 1px solid var(--line); }
+.dA__list li { border-top: 1px solid var(--line); }
+.dA__list button { width: 100%; display: flex; gap: 16px; align-items: baseline; padding: 11px 0; text-align: left; color: var(--ink-soft); font-size: 15px; transition: color .25s; }
+.dA__list button span { font: 300 11px/1 var(--font-mono); color: var(--ink-soft); width: 20px; flex: none; }
+.dA__list button:hover { color: var(--ink); }
+.dA__list button.on { color: var(--ink); }
+.dA__list button.on::after { content: ""; margin-left: auto; align-self: center; width: 22px; height: 1px; background: var(--ink); }
+.dA__stage { position: relative; }
+.dA__pile { position: relative; height: clamp(360px, 40vw, 600px); touch-action: pan-y; cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; outline: none; }
+.dA__pile:focus-visible { outline: 2px solid var(--sheen-2); outline-offset: 6px; }
+.dA__pile figure { position: absolute; left: 50%; top: 50%; margin: 0; width: var(--w); aspect-ratio: var(--ar);
+  background: #fff; padding: clamp(6px, .6vw, 10px);
+  box-shadow: 0 1px 1px rgba(0,0,0,.06), 0 18px 34px -18px rgba(0,0,0,.35);
+  transform: translate(-50%, -50%) translate(var(--x), var(--y)) rotate(var(--r));
+  transition: transform .62s var(--ease-out), opacity .45s ease; transition-delay: var(--d, 0s); will-change: transform; }
+.dA__pile figure.l { --w: 74%; } .dA__pile figure.p { --w: 42%; }
+.dA__pile img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-user-drag: none; }
+.dA__pile figure.out { transform: translate(-50%, -50%) translate(calc(var(--dx) * 118%), -5%) rotate(calc(var(--dx) * 13deg));
+  transition: transform .34s cubic-bezier(.45, 0, .85, .55); transition-delay: 0s; }
+.dA__pile figure.drag { transition: none; }
+.dA--js:not(.in) .dA__pile figure { opacity: 0; transform: translate(-50%, -50%) translate(var(--x), calc(var(--y) - 46%)) rotate(calc(var(--r) * -2.2)) scale(1.06); }
+.dA__cap { display: flex; justify-content: space-between; gap: 16px; margin-top: 18px; color: var(--ink-soft); }
+.dA__name { color: var(--ink); display: none; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 760px) {
+  .dA__grid { grid-template-columns: 1fr; }
+  .dA__list { display: none; }
+  .dA__stage { margin-top: 26px; }
+  .dA__pile { height: 92vw; max-height: 420px; }
+  .dA__pile figure.l { --w: 88%; } .dA__pile figure.p { --w: 60%; }
+  .dA__name { display: block; }
+  .dA__hint { display: none; }
+}
+
+/* =========================================================
+   B — «Сетка»: an asymmetric grid; tiles open like curtains as they arrive
+   ========================================================= */
+.dB { padding-block: clamp(40px, 6vw, 96px) clamp(48px, 7vw, 110px); }
+.dB__head { display: grid; grid-template-columns: 1fr 1fr; column-gap: clamp(40px, 8vw, 132px); align-items: end; margin-bottom: clamp(28px, 4vw, 56px); }
+.dB__grid { display: grid; grid-template-columns: repeat(12, 1fr); grid-auto-rows: clamp(110px, 12.5vw, 190px); grid-auto-flow: dense; gap: clamp(8px, 1.1vw, 16px); }
+.dB__grid figure { position: relative; margin: 0; grid-column: span var(--c); grid-row: span var(--r); overflow: hidden; background: var(--bg-deep); }
+.dB__grid img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.4s var(--ease-out); }
+.dB__grid figcaption { position: absolute; left: 8px; bottom: 8px; padding: 4px 7px 3px; background: var(--bg); color: var(--ink); font: 300 10.5px/1.25 var(--font-mono); text-transform: uppercase; letter-spacing: .03em; max-width: calc(100% - 16px); }
+/* (the curtain is on the picture, not on the observed tile: a clipped tile never counts as "seen") */
+.dB--js .dB__grid figure { background: none; }
+.dB--js .dB__grid figure img { clip-path: inset(100% 0 0 0); transform: scale(1.18); transition: clip-path 1s var(--ease), transform 1.4s var(--ease-out); transition-delay: inherit; }
+.dB--js .dB__grid figcaption { opacity: 0; transition: opacity .5s ease .7s; }
+.dB--js .dB__grid figure.in img { clip-path: inset(0 0 0 0); transform: scale(1); }
+.dB--js .dB__grid figure.in figcaption { opacity: 1; }
+@media (hover: hover) { .dB__grid figure.in:hover img { transform: scale(1.04); transition-duration: .9s; } }
+@media (max-width: 760px) {
+  .dB__head { grid-template-columns: 1fr; row-gap: 12px; }
+  .dB__grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 27vw; }
+  .dB__grid figure { grid-column: span var(--cm); grid-row: span var(--rm); }
+}
+
+/* =========================================================
+   C — «Указатель»: a list of things; the photo of the one in the middle of the screen stays in view
+   ========================================================= */
+.dC { padding-block: clamp(40px, 6vw, 96px) clamp(48px, 7vw, 110px); }
+.dC__head { display: grid; grid-template-columns: 1fr 1fr; column-gap: clamp(40px, 8vw, 132px); align-items: end; }
+.dC__body { display: grid; grid-template-columns: 1fr 1fr; column-gap: clamp(40px, 8vw, 132px); align-items: start; }
+.dC__frame { position: sticky; top: calc(50vh - min(30vh, 260px) + 28px); height: min(60vh, 520px); margin-top: clamp(40px, 6vw, 80px); }
+.dC__frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: 50% 50%; opacity: 0; transform: scale(.97); transition: opacity .45s ease, transform .9s var(--ease-out); }
+.dC__frame img.on { opacity: 1; transform: none; }
+.dC__count { position: absolute; left: 0; bottom: -28px; color: var(--ink-soft); }
+.dC__list { list-style: none; margin: 0; padding: 28vh 0 34vh; }
+.dC__list li { display: grid; grid-template-columns: 34px 1fr; column-gap: 12px; padding: 2.2vh 0; border-top: 1px solid var(--line); color: #A7A9A4; transition: color .3s; cursor: default; }
+.dC__list li:last-child { border-bottom: 1px solid var(--line); }
+.dC__list .n { font: 300 11px/1 var(--font-mono); padding-top: .9em; }
+.dC__list .w { font: 400 clamp(28px, 3.6vw, 54px)/1.08 var(--font-display); letter-spacing: -.02em; }
+.dC__list .who { grid-column: 2; margin-top: 6px; font: 300 11px/1.3 var(--font-mono); text-transform: uppercase; letter-spacing: .03em; }
+.dC__list li.on { color: var(--ink); }
+@media (max-width: 760px) {
+  .dC__head { grid-template-columns: 1fr; row-gap: 12px; }
+  .dC__body { grid-template-columns: 1fr; }
+  .dC__frame { top: 64px; height: 44vh; margin-top: 24px; z-index: 2; background: var(--bg); box-shadow: 0 18px 18px -6px var(--bg); }
+  .dC__count { bottom: 6px; left: auto; right: 0; background: var(--bg); padding: 2px 0 2px 6px; }
+  .dC__list { padding: 12px 0 40vh; }
+  .dC__list li { padding: 14px 0; }
+  .dC__list .w { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+<header class="lab-bar">
+  <a href="../">← 40ka</a>
+  <nav><a href="#a">A · Гнездо</a><a href="#b">B · Сетка</a><a href="#c">C · Указатель</a></nav>
+</header>
+
+<div class="wrap lab-intro">
+  <h1>«Детали»: три варианта</h1>
+  <p>Черновики блока, чтобы выбрать формат. Всё работает по‑настоящему, попробуйте на телефоне. На сайт попадёт только выбранный.</p>
+</div>
+
+<!-- ======================= A ======================= -->
+<div class="wrap lab-tag"><b>Вариант A — Гнездо</b> снимки ложатся стопкой, как находки сороки. Верхний можно смахнуть или нажать: он уходит под низ. Пока вы не трогаете, стопка листается сама.</div>
+<section class="dA" id="a" aria-label="Детали">
+  <div class="wrap dA__grid">
+    <div class="dA__side">
+      <h2 class="dh2">Детали</h2>
+      <p class="dlead">Визитки, вывеска, панама, бейдж — мелочи, из которых складывается бренд.</p>
+      <ol class="dA__list">
+        <li><button type="button" data-i="0"><span>01</span>Granada Coffee — визитки</button></li>
+        <li><button type="button" data-i="1"><span>02</span>Kofio — вывеска</button></li>
+        <li><button type="button" data-i="2"><span>03</span>Mosaik Travel — панама</button></li>
+        <li><button type="button" data-i="3"><span>04</span>Нота — вывеска</button></li>
+        <li><button type="button" data-i="4"><span>05</span>Университет — бейдж</button></li>
+        <li><button type="button" data-i="5"><span>06</span>Granada Coffee — фургон</button></li>
+        <li><button type="button" data-i="6"><span>07</span>Kofio — посуда</button></li>
+        <li><button type="button" data-i="7"><span>08</span>Университет — свитшот</button></li>
+      </ol>
+    </div>
+    <div class="dA__stage">
+      <div class="dA__pile" tabindex="0" role="button" aria-label="Стопка снимков: следующий">
+        <figure class="l" data-name="Granada Coffee — визитки" style="--ar:1200/709;--r:-3deg;--x:-3%;--y:2%"><img src="../img/s/granada-cards.jpg" decoding="async" alt="Granada Coffee: визитки"></figure>
+        <figure class="l" data-name="Kofio — вывеска" style="--ar:1200/739;--r:4deg;--x:4%;--y:-3%"><img src="../img/s/kofio-sign.jpg" decoding="async" alt="Kofio: вывеска"></figure>
+        <figure class="p" data-name="Mosaik Travel — панама" style="--ar:4/5;--r:-5deg;--x:-6%;--y:3%"><img src="../img/s/mosaik-hat-p.jpg" decoding="async" alt="Mosaik Travel: панама"></figure>
+        <figure class="p" data-name="Нота — вывеска" style="--ar:4/5;--r:3deg;--x:7%;--y:-2%"><img src="../img/s/nota-sign.jpg" decoding="async" alt="Нота: вывеска"></figure>
+        <figure class="p" data-name="Университет — бейдж" style="--ar:656/772;--r:-2deg;--x:-4%;--y:4%"><img src="../img/s/uni-badge.jpg" decoding="async" alt="Университет: бейдж"></figure>
+        <figure class="l" data-name="Granada Coffee — фургон" style="--ar:1200/727;--r:5deg;--x:2%;--y:-4%"><img src="../img/s/granada-van.jpg" decoding="async" alt="Granada Coffee: фургон"></figure>
+        <figure class="l" data-name="Kofio — посуда" style="--ar:1200/865;--r:-4.5deg;--x:-2%;--y:1%"><img src="../img/s/kofio-cups.jpg" decoding="async" alt="Kofio: стаканы и посуда"></figure>
+        <figure class="l" data-name="Университет — свитшот" style="--ar:1200/727;--r:2.5deg;--x:3%;--y:-1%"><img src="../img/s/uni-sweat.jpg" decoding="async" alt="Университет: свитшот"></figure>
+      </div>
+      <div class="dA__cap mono"><span class="dA__name">Granada Coffee — визитки</span><span class="dA__hint">нажмите или смахните верхний снимок</span><span class="dA__n">01 / 08</span></div>
+      <p class="vh" aria-live="polite" id="dA-live"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= B ======================= -->
+<div class="wrap lab-tag"><b>Вариант B — Сетка</b> снимки разного размера собраны в одну композицию и открываются шторкой, когда до них доходит экран. Спокойно и без движения по горизонтали.</div>
+<section class="dB" id="b" aria-label="Детали">
+  <div class="wrap">
+    <div class="dB__head"><h2 class="dh2">Детали</h2><p class="dlead">Визитки, вывеска, панама, бейдж — мелочи, из которых складывается бренд.</p></div>
+    <div class="dB__grid">
+      <figure style="--c:6;--r:2;--cm:2;--rm:2"><img src="../img/s/granada-cards.jpg" decoding="async" alt="Granada Coffee: визитки"><figcaption>Granada Coffee — визитки</figcaption></figure>
+      <figure style="--c:3;--r:2;--cm:1;--rm:2"><img src="../img/s/mosaik-hat-p.jpg" decoding="async" alt="Mosaik Travel: панама"><figcaption>Mosaik — панама</figcaption></figure>
+      <figure style="--c:3;--r:1;--cm:1;--rm:1"><img src="../img/s/kofio-sign.jpg" decoding="async" alt="Kofio: вывеска"><figcaption>Kofio — вывеска</figcaption></figure>
+      <figure style="--c:3;--r:1;--cm:1;--rm:1"><img src="../img/s/granada-van.jpg" decoding="async" alt="Granada Coffee: фургон"><figcaption>Granada — фургон</figcaption></figure>
+      <figure style="--c:3;--r:2;--cm:1;--rm:2"><img src="../img/s/nota-sign.jpg" decoding="async" alt="Нота: вывеска" style="object-position:50% 45%"><figcaption>Нота — вывеска</figcaption></figure>
+      <figure style="--c:4;--r:2;--cm:1;--rm:1"><img src="../img/s/kofio-cups.jpg" decoding="async" alt="Kofio: стаканы и посуда"><figcaption>Kofio — посуда</figcaption></figure>
+      <figure style="--c:3;--r:2;--cm:1;--rm:2"><img src="../img/s/uni-badge.jpg" decoding="async" alt="Университет: бейдж"><figcaption>Университет — бейдж</figcaption></figure>
+      <figure style="--c:2;--r:2;--cm:1;--rm:1"><img src="../img/s/uni-sweat.jpg" decoding="async" alt="Университет: свитшот" style="object-position:48% 50%"><figcaption>Свитшот</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= C ======================= -->
+<div class="wrap lab-tag"><b>Вариант C — Указатель</b> список вещей крупным шрифтом. Строка, которая проходит середину экрана, загорается, и рядом (на телефоне сверху) появляется её снимок.</div>
+<section class="dC" id="c" aria-label="Детали">
+  <div class="wrap">
+    <div class="dC__head"><h2 class="dh2">Детали</h2><p class="dlead">Визитки, вывеска, панама, бейдж — мелочи, из которых складывается бренд.</p></div>
+    <div class="dC__body">
+      <div class="dC__frame" aria-hidden="true">
+        <img class="on" src="../img/s/granada-cards.jpg" decoding="async" alt="">
+        <img src="../img/s/kofio-sign.jpg" decoding="async" alt="">
+        <img src="../img/s/mosaik-hat-p.jpg" decoding="async" alt="">
+        <img src="../img/s/nota-sign.jpg" decoding="async" alt="">
+        <img src="../img/s/uni-badge.jpg" decoding="async" alt="">
+        <img src="../img/s/granada-van.jpg" decoding="async" alt="">
+        <img src="../img/s/kofio-cups.jpg" decoding="async" alt="">
+        <img src="../img/s/uni-sweat.jpg" decoding="async" alt="">
+        <span class="dC__count mono">01 / 08</span>
+      </div>
+      <ol class="dC__list">
+        <li class="on"><span class="n">01</span><span class="w">Визитки</span><span class="who">Granada Coffee</span></li>
+        <li><span class="n">02</span><span class="w">Вывеска</span><span class="who">Kofio</span></li>
+        <li><span class="n">03</span><span class="w">Панама</span><span class="who">Mosaik Travel</span></li>
+        <li><span class="n">04</span><span class="w">Вывеска</span><span class="who">Нота</span></li>
+        <li><span class="n">05</span><span class="w">Бейдж</span><span class="who">Университет</span></li>
+        <li><span class="n">06</span><span class="w">Фургон</span><span class="who">Granada Coffee</span></li>
+        <li><span class="n">07</span><span class="w">Посуда</span><span class="who">Kofio</span></li>
+        <li><span class="n">08</span><span class="w">Свитшот</span><span class="who">Университет</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<div class="wrap lab-end">конец черновиков · <a href="#a">A</a> · <a href="#b">B</a> · <a href="#c">C</a> · <a href="../">на сайт</a></div>
+
+<script>
+(function () {
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var IO = 'IntersectionObserver' in window;
+  function pad(i) { return (i < 9 ? '0' : '') + (i + 1); }
+
+  /* ---------- A: the pile ---------- */
+  (function () {
+    var sec = document.getElementById('a'); if (!sec) return;
+    var pile = sec.querySelector('.dA__pile'), cards = [].slice.call(pile.querySelectorAll('figure')), n = cards.length;
+    var btns = [].slice.call(sec.querySelectorAll('.dA__list button'));
+    var nameEl = sec.querySelector('.dA__name'), numEl = sec.querySelector('.dA__n'), live = document.getElementById('dA-live');
+    var order = cards.map(function (_, i) { return i; });      // order[0] is the top print
+    var busy = false, touched = false, timer = null, visible = false, drag = null;
+    function layout() {
+      order.forEach(function (ci, pos) { cards[ci].style.zIndex = n - pos; });
+      var t = order[0];
+      nameEl.textContent = cards[t].getAttribute('data-name');
+      numEl.textContent = pad(t) + ' / ' + pad(n - 1);
+      btns.forEach(function (b, i) { b.classList.toggle('on', i === t); });
+      if (touched) live.textContent = cards[t].getAttribute('data-name');
+    }
+    function later(fn, ms) { setTimeout(fn, reduce ? 0 : ms); }
+    // the top print is flicked off to one side, then slides back in under the pile
+    function next(dir) {
+      if (busy) return; busy = true;
+      var c = cards[order[0]];
+      c.style.setProperty('--dx', dir); c.style.transform = ''; c.classList.remove('drag'); c.classList.add('out');
+      later(function () {
+        order.push(order.shift()); layout();
+        c.classList.remove('out');
+        later(function () { busy = false; }, 140);
+      }, 340);
+    }
+    // any print comes out from under the pile and lands on top
+    function bring(i, dir) {
+      if (busy || order[0] === i) return; busy = true;
+      var c = cards[i];
+      c.style.setProperty('--dx', dir || -1); c.classList.add('out');
+      later(function () {
+        order.splice(order.indexOf(i), 1); order.unshift(i); layout();
+        c.classList.remove('out');
+        later(function () { busy = false; }, 140);
+      }, 340);
+    }
+    function user() { touched = true; stopAuto(); }
+    function startAuto() { if (reduce || touched || timer) return; timer = setInterval(function () { if (visible && !document.hidden) next(1); }, 3200); }
+    function stopAuto() { clearInterval(timer); timer = null; }
+
+    btns.forEach(function (b) { b.addEventListener('click', function () { user(); bring(+b.getAttribute('data-i'), -1); }); });
+    pile.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); user(); next(1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); user(); bring(order[n - 1], -1); }
+    });
+    // tap = next; a sideways swipe carries the top print with the finger and throws it
+    pile.addEventListener('pointerdown', function (e) {
+      if (busy || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      drag = { x: e.clientX, y: e.clientY, id: e.pointerId, dx: 0, on: false };
+    });
+    pile.addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var dx = e.clientX - drag.x, dy = e.clientY - drag.y, c = cards[order[0]];
+      if (!drag.on) {
+        if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.2) { drag.on = true; user(); try { pile.setPointerCapture(e.pointerId); } catch (_) {} c.classList.add('drag'); }
+        else if (Math.abs(dy) > 10) { drag = null; return; }
+        else return;
+      }
+      drag.dx = dx;
+      c.style.transform = 'translate(-50%, -50%) translate(calc(var(--x) + ' + dx.toFixed(1) + 'px), var(--y)) rotate(calc(var(--r) + ' + (dx * .045).toFixed(2) + 'deg))';
+    });
+    function end(e, cancel) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var d = drag; drag = null;
+      var c = cards[order[0]];
+      if (d.on) {
+        c.classList.remove('drag');
+        if (!cancel && Math.abs(d.dx) > 64) next(d.dx > 0 ? 1 : -1);
+        else c.style.transform = '';
+      } else if (!cancel) { user(); next(1); }
+    }
+    pile.addEventListener('pointerup', function (e) { end(e, false); });
+    pile.addEventListener('pointercancel', function (e) { end(e, true); });
+
+    layout();
+    if (!IO || reduce) { sec.classList.add('in'); return; }
+    sec.classList.add('dA--js');
+    // on arrival the prints drop onto the pile one by one, the bottom one first
+    new IntersectionObserver(function (es, o) {
+      if (!es[0].isIntersecting) return;
+      o.disconnect();
+      order.forEach(function (ci, pos) { cards[ci].style.setProperty('--d', ((n - 1 - pos) * .085).toFixed(3) + 's'); });
+      sec.classList.add('in');
+      setTimeout(function () { cards.forEach(function (c) { c.style.removeProperty('--d'); }); }, 1400);
+    }, { threshold: .3 }).observe(pile);
+    new IntersectionObserver(function (es) {
+      visible = es[0].isIntersecting;
+      if (visible) setTimeout(startAuto, 1600); else stopAuto();
+    }, { threshold: .6 }).observe(pile);
+  })();
+
+  /* ---------- B: curtains ---------- */
+  (function () {
+    var sec = document.getElementById('b'); if (!sec || reduce || !IO) return;
+    sec.classList.add('dB--js');
+    var io = new IntersectionObserver(function (es) {
+      var k = 0;
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.style.transitionDelay = (k++ * .09) + 's';
+        e.target.classList.add('in'); io.unobserve(e.target);
+      });
+    }, { threshold: .18, rootMargin: '0px 0px -6% 0px' });
+    [].forEach.call(sec.querySelectorAll('figure'), function (f) { io.observe(f); });
+  })();
+
+  /* ---------- C: the index ---------- */
+  (function () {
+    var sec = document.getElementById('c'); if (!sec) return;
+    var items = [].slice.call(sec.querySelectorAll('.dC__list li')), imgs = [].slice.call(sec.querySelectorAll('.dC__frame img'));
+    var count = sec.querySelector('.dC__count'), cur = 0;
+    function show(i) {
+      if (i === cur) return; cur = i;
+      items.forEach(function (li, k) { li.classList.toggle('on', k === i); });
+      imgs.forEach(function (im, k) { im.classList.toggle('on', k === i); });
+      count.textContent = pad(i) + ' / ' + pad(items.length - 1);
+    }
+    var fine = window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (fine) items.forEach(function (li, k) { li.addEventListener('mouseenter', function () { show(k); }); });
+    if (!IO) return;
+    var phone = window.matchMedia && matchMedia('(max-width: 760px)').matches, vh = window.innerHeight;
+    // the line crossing a thin band is the one shown: the middle of the screen, or on phones just under the photo
+    var fb = 64 + .44 * vh + 10;
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) show(items.indexOf(e.target)); });
+    }, { rootMargin: phone ? '-' + Math.round(fb) + 'px 0px -' + Math.round(vh - fb - 56) + 'px 0px' : '-48% 0px -48% 0px' });
+    items.forEach(function (li) { io.observe(li); });
+  })();
+})();
+</script>
+</body>
+</html>
