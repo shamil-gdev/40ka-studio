@@ -281,21 +281,37 @@
     </div>
   </section>
 
-  <section class="details" id="details" aria-label="Details">
-    <div class="wrap details__head">
-      <h2>Details</h2>
-      <p>Business cards, a sign, a bucket hat, a badge — the small things a brand is made of.</p>
+  <section class="details nest" id="details" aria-label="Details">
+    <div class="wrap nest__grid">
+      <div class="nest__side">
+        <h2>Details</h2>
+        <p>Business cards, a sign, a bucket hat, a badge — the small things a brand is made of.</p>
+        <ol class="nest__list">
+          <li><button type="button" data-i="0"><span>01</span>Granada Coffee — business cards</button></li>
+          <li><button type="button" data-i="1"><span>02</span>Kofio — sign</button></li>
+          <li><button type="button" data-i="2"><span>03</span>Mosaik Travel — bucket hat</button></li>
+          <li><button type="button" data-i="3"><span>04</span>Nota — sign</button></li>
+          <li><button type="button" data-i="4"><span>05</span>University — badge</button></li>
+          <li><button type="button" data-i="5"><span>06</span>Granada Coffee — van</button></li>
+          <li><button type="button" data-i="6"><span>07</span>Kofio — cups and tableware</button></li>
+          <li><button type="button" data-i="7"><span>08</span>University — sweatshirt</button></li>
+        </ol>
+      </div>
+      <div class="nest__stage">
+        <div class="nest__pile" tabindex="0" role="button" aria-label="Pile of photos: next" data-cursor="Next">
+          <figure class="l" data-name="Granada Coffee — business cards" style="--ar:1200/709;--r:-3deg;--x:-3%;--y:2%"><img src="../img/s/granada-cards.jpg" decoding="async" fetchpriority="low" alt="Granada Coffee: business cards"></figure>
+          <figure class="l" data-name="Kofio — sign" style="--ar:1200/739;--r:4deg;--x:4%;--y:-3%"><img src="../img/s/kofio-sign.jpg" decoding="async" fetchpriority="low" alt="Kofio: sign"></figure>
+          <figure class="p" data-name="Mosaik Travel — bucket hat" style="--ar:4/5;--r:-5deg;--x:-6%;--y:3%"><img src="../img/s/mosaik-hat-p.jpg" decoding="async" fetchpriority="low" alt="Mosaik Travel: bucket hat"></figure>
+          <figure class="p" data-name="Nota — sign" style="--ar:4/5;--r:3deg;--x:7%;--y:-2%"><img src="../img/s/nota-sign.jpg" decoding="async" fetchpriority="low" alt="Nota: sign"></figure>
+          <figure class="p" data-name="University — badge" style="--ar:656/772;--r:-2deg;--x:-4%;--y:4%"><img src="../img/s/uni-badge.jpg" decoding="async" fetchpriority="low" alt="University: badge"></figure>
+          <figure class="l" data-name="Granada Coffee — van" style="--ar:1200/727;--r:5deg;--x:2%;--y:-4%"><img src="../img/s/granada-van.jpg" decoding="async" fetchpriority="low" alt="Granada Coffee: van"></figure>
+          <figure class="l" data-name="Kofio — cups and tableware" style="--ar:1200/865;--r:-4.5deg;--x:-2%;--y:1%"><img src="../img/s/kofio-cups.jpg" decoding="async" fetchpriority="low" alt="Kofio: cups and tableware"></figure>
+          <figure class="l" data-name="University — sweatshirt" style="--ar:1200/727;--r:2.5deg;--x:3%;--y:-1%"><img src="../img/s/uni-sweat.jpg" decoding="async" fetchpriority="low" alt="University: sweatshirt"></figure>
+        </div>
+        <div class="nest__cap"><span class="nest__name">Granada Coffee — business cards</span><span class="nest__hint nest__hint--fine">Click the photo or pick one from the list</span><span class="nest__hint nest__hint--touch">Tap or swipe the photo</span><span class="nest__n">01 / 08</span></div>
+        <p class="vh" aria-live="polite"></p>
+      </div>
     </div>
-    <div class="details__strip"><div class="details__track">
-      <figure style="--ar:16 / 10"><div class="details__img"><img src="../img/s/granada-cards.jpg" decoding="async" alt="Granada Coffee: business cards" style="object-position:50% 50%"></div><figcaption>Granada Coffee — business cards</figcaption></figure>
-      <figure style="--ar:16 / 10"><div class="details__img"><img src="../img/s/kofio-sign.jpg" decoding="async" alt="Kofio: sign" style="object-position:50% 50%"></div><figcaption>Kofio — sign</figcaption></figure>
-      <figure style="--ar:4 / 5"><div class="details__img"><img src="../img/s/mosaik-hat.jpg" decoding="async" alt="Mosaik Travel: bucket hat" style="object-position:84% 50%"></div><figcaption>Mosaik Travel — bucket hat</figcaption></figure>
-      <figure style="--ar:4 / 5"><div class="details__img"><img src="../img/s/nota-sign.jpg" decoding="async" alt="Nota: sign" style="object-position:50% 50%"></div><figcaption>Nota — sign</figcaption></figure>
-      <figure style="--ar:3 / 2"><div class="details__img"><img src="../img/s/uni-lanyard.jpg" decoding="async" alt="University: badge" style="object-position:40% 50%"></div><figcaption>University — badge</figcaption></figure>
-      <figure style="--ar:5 / 3"><div class="details__img"><img src="../img/s/granada-van.jpg" decoding="async" alt="Granada Coffee: van" style="object-position:50% 50%"></div><figcaption>Granada Coffee — van</figcaption></figure>
-      <figure style="--ar:4 / 3"><div class="details__img"><img src="../img/s/kofio-cups.jpg" decoding="async" alt="Kofio: cups and tableware" style="object-position:50% 50%"></div><figcaption>Kofio — cups and tableware</figcaption></figure>
-      <figure style="--ar:3 / 2"><div class="details__img"><img src="../img/s/uni-sweat.jpg" decoding="async" alt="University: sweatshirt" style="object-position:50% 50%"></div><figcaption>University — sweatshirt</figcaption></figure>
-    </div></div>
   </section>
 
   <section class="section wrap" id="about">
@@ -341,6 +357,7 @@
 </section>
 
 <script src="../assets/site.js"></script>
+<script src="../assets/details.js"></script>
 <script src="../assets/intro.js"></script>
 <script src="../assets/flight.js"></script>
 <script src="../assets/about.js"></script>

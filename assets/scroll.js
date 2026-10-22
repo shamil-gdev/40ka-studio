@@ -48,7 +48,7 @@
   });
 
   /* ---------- 2. headings rise line by line ---------- */
-  var heads = Array.prototype.slice.call(document.querySelectorAll('.section__head h2, .details__head h2, .contact h2'));
+  var heads = Array.prototype.slice.call(document.querySelectorAll('.section__head h2, .nest__side h2, .contact h2'));
   function splitLines(h) {
     if (h.getAttribute('data-split')) return;
     var text = h.textContent.replace(/\s+/g, ' ').trim();

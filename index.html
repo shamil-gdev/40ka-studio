@@ -280,21 +280,37 @@
     </div>
   </section>
 
-  <section class="details" id="details" aria-label="Детали">
-    <div class="wrap details__head">
-      <h2>Детали</h2>
-      <p>Визитки, вывеска, панама, бейдж — мелочи, из которых складывается бренд.</p>
+  <section class="details nest" id="details" aria-label="Детали">
+    <div class="wrap nest__grid">
+      <div class="nest__side">
+        <h2>Детали</h2>
+        <p>Визитки, вывеска, панама, бейдж — мелочи, из которых складывается бренд.</p>
+        <ol class="nest__list">
+          <li><button type="button" data-i="0"><span>01</span>Granada Coffee — визитки</button></li>
+          <li><button type="button" data-i="1"><span>02</span>Kofio — вывеска</button></li>
+          <li><button type="button" data-i="2"><span>03</span>Mosaik Travel — панама</button></li>
+          <li><button type="button" data-i="3"><span>04</span>Нота — вывеска</button></li>
+          <li><button type="button" data-i="4"><span>05</span>Университет — бейдж</button></li>
+          <li><button type="button" data-i="5"><span>06</span>Granada Coffee — фургон</button></li>
+          <li><button type="button" data-i="6"><span>07</span>Kofio — стаканы и посуда</button></li>
+          <li><button type="button" data-i="7"><span>08</span>Университет — свитшот</button></li>
+        </ol>
+      </div>
+      <div class="nest__stage">
+        <div class="nest__pile" tabindex="0" role="button" aria-label="Стопка снимков: следующий" data-cursor="Дальше">
+          <figure class="l" data-name="Granada Coffee — визитки" style="--ar:1200/709;--r:-3deg;--x:-3%;--y:2%"><img src="img/s/granada-cards.jpg" decoding="async" fetchpriority="low" alt="Granada Coffee: визитки"></figure>
+          <figure class="l" data-name="Kofio — вывеска" style="--ar:1200/739;--r:4deg;--x:4%;--y:-3%"><img src="img/s/kofio-sign.jpg" decoding="async" fetchpriority="low" alt="Kofio: вывеска"></figure>
+          <figure class="p" data-name="Mosaik Travel — панама" style="--ar:4/5;--r:-5deg;--x:-6%;--y:3%"><img src="img/s/mosaik-hat-p.jpg" decoding="async" fetchpriority="low" alt="Mosaik Travel: панама"></figure>
+          <figure class="p" data-name="Нота — вывеска" style="--ar:4/5;--r:3deg;--x:7%;--y:-2%"><img src="img/s/nota-sign.jpg" decoding="async" fetchpriority="low" alt="Нота: вывеска"></figure>
+          <figure class="p" data-name="Университет — бейдж" style="--ar:656/772;--r:-2deg;--x:-4%;--y:4%"><img src="img/s/uni-badge.jpg" decoding="async" fetchpriority="low" alt="Университет: бейдж"></figure>
+          <figure class="l" data-name="Granada Coffee — фургон" style="--ar:1200/727;--r:5deg;--x:2%;--y:-4%"><img src="img/s/granada-van.jpg" decoding="async" fetchpriority="low" alt="Granada Coffee: фургон"></figure>
+          <figure class="l" data-name="Kofio — стаканы и посуда" style="--ar:1200/865;--r:-4.5deg;--x:-2%;--y:1%"><img src="img/s/kofio-cups.jpg" decoding="async" fetchpriority="low" alt="Kofio: стаканы и посуда"></figure>
+          <figure class="l" data-name="Университет — свитшот" style="--ar:1200/727;--r:2.5deg;--x:3%;--y:-1%"><img src="img/s/uni-sweat.jpg" decoding="async" fetchpriority="low" alt="Университет: свитшот"></figure>
+        </div>
+        <div class="nest__cap"><span class="nest__name">Granada Coffee — визитки</span><span class="nest__hint nest__hint--fine">Нажмите на снимок или выберите в списке</span><span class="nest__hint nest__hint--touch">Нажмите или смахните снимок</span><span class="nest__n">01 / 08</span></div>
+        <p class="vh" aria-live="polite"></p>
+      </div>
     </div>
-    <div class="details__strip"><div class="details__track">
-      <figure style="--ar:16 / 10"><div class="details__img"><img src="img/s/granada-cards.jpg" decoding="async" alt="Granada Coffee: визитки" style="object-position:50% 50%"></div><figcaption>Granada Coffee — визитки</figcaption></figure>
-      <figure style="--ar:16 / 10"><div class="details__img"><img src="img/s/kofio-sign.jpg" decoding="async" alt="Kofio: вывеска" style="object-position:50% 50%"></div><figcaption>Kofio — вывеска</figcaption></figure>
-      <figure style="--ar:4 / 5"><div class="details__img"><img src="img/s/mosaik-hat.jpg" decoding="async" alt="Mosaik Travel: панама" style="object-position:84% 50%"></div><figcaption>Mosaik Travel — панама</figcaption></figure>
-      <figure style="--ar:4 / 5"><div class="details__img"><img src="img/s/nota-sign.jpg" decoding="async" alt="Нота: вывеска" style="object-position:50% 50%"></div><figcaption>Нота — вывеска</figcaption></figure>
-      <figure style="--ar:3 / 2"><div class="details__img"><img src="img/s/uni-lanyard.jpg" decoding="async" alt="Университет: бейдж" style="object-position:40% 50%"></div><figcaption>Университет — бейдж</figcaption></figure>
-      <figure style="--ar:5 / 3"><div class="details__img"><img src="img/s/granada-van.jpg" decoding="async" alt="Granada Coffee: фургон" style="object-position:50% 50%"></div><figcaption>Granada Coffee — фургон</figcaption></figure>
-      <figure style="--ar:4 / 3"><div class="details__img"><img src="img/s/kofio-cups.jpg" decoding="async" alt="Kofio: стаканы и посуда" style="object-position:50% 50%"></div><figcaption>Kofio — стаканы и посуда</figcaption></figure>
-      <figure style="--ar:3 / 2"><div class="details__img"><img src="img/s/uni-sweat.jpg" decoding="async" alt="Университет: свитшот" style="object-position:50% 50%"></div><figcaption>Университет — свитшот</figcaption></figure>
-    </div></div>
   </section>
 
   <section class="section wrap" id="about">
@@ -340,6 +356,7 @@
 </section>
 
 <script src="assets/site.js"></script>
+<script src="assets/details.js"></script>
 <script src="assets/intro.js"></script>
 <script src="assets/flight.js"></script>
 <script src="assets/about.js"></script>
