@@ -475,6 +475,7 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
 .chat__btn svg { width: 20px; height: 20px; flex: none; }
 .chat__btn:hover { color: var(--ink); background: var(--white); border-color: var(--white); }
 .foot { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: clamp(48px, 7vw, 120px); padding-top: 24px; border-top: 1px solid #3A3C3B; font-size: 13px; color: #9A9C99; }
+.foot__top { color: inherit; transition: color .2s; } .foot__top:hover { color: var(--white); }
 
 /* ---------- case pages ---------- */
 .case-hero { padding-block: clamp(40px, 7vw, 96px) clamp(24px, 4vw, 48px); display: grid; grid-template-columns: 2fr 1fr; gap: 32px; align-items: end; }

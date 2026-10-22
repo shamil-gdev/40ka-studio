@@ -34,11 +34,18 @@
       requestAnimationFrame(function () {
         if (stopped) { stopped = false; lenis.start(); }
         lenis.scrollTo(el, { duration: 1.2, force: true });
-        if (id !== '#top') history.replaceState(null, '', id);
+        if (id !== '#top' && id !== '#') history.replaceState(null, '', id);
       });
     });
     window.__lenis = lenis;
   }
+  // «Наверх ↑» in the footer: on touch screens the page glides up too instead of jumping
+  if (!lenis) document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a.foot__top');
+    if (!a) return;
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+  });
 
   /* ---------- 2. headings rise line by line ---------- */
   var heads = Array.prototype.slice.call(document.querySelectorAll('.section__head h2, .details__head h2, .contact h2'));
