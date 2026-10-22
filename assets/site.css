@@ -135,6 +135,8 @@ body.menu-open .flight-layer { display: none; }
 .bar nav a:hover::after { right: 0; }
 .lang { display: flex; gap: 10px; font-size: 13px; color: var(--ink-soft); }
 .lang b { font-weight: 500; color: var(--ink); }
+.lang a { transition: color .2s; } .lang a:hover { color: var(--ink); }
+.bar.on-dark .lang a:hover { color: var(--white); }
 .bar__right { display: flex; align-items: center; gap: 18px; }
 .burger { display: none; width: 40px; height: 40px; position: relative; z-index: 71; }
 .burger i { position: absolute; left: 9px; right: 9px; height: 2px; background: var(--ink); transition: transform .4s var(--ease), top .4s var(--ease), background .3s; }
