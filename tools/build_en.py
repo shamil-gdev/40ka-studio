@@ -17,7 +17,7 @@ TR = {
     # ---------- shared: header, menu, contact ----------
     'нажмите, чтобы пропустить': 'tap to skip',
     'Работы': 'Work', 'Услуги': 'Services', 'О студии': 'About', 'Контакт': 'Contact',
-    'Москва — Дубай — Эр-Рияд': 'Moscow — Dubai — Riyadh',
+    'Россия · Турция · Саудовская Аравия · Индонезия': 'Russia · Turkey · Saudi Arabia · Indonesia',
     '40ka — на главную': '40ka — home', 'Разделы': 'Sections', 'Меню': 'Menu',
     'Смотреть': 'View', 'Написать': 'Write', 'Скопировать': 'Copy', 'Мессенджеры': 'Messengers',
     'Расскажите о задаче.': 'Tell us about your project.',
@@ -25,8 +25,8 @@ TR = {
         'One email is enough: who you are, what you want to change and by when. We reply within two working days.',
 
     # ---------- home: meta ----------
-    '40ka: сорока на хвосте принесёт. Стратегия, айдентика, сайты, ролики и продвижение для бизнеса, который хотят рекомендовать. Москва, Дубай, Эр-Рияд.':
-        '40ka: a little bird told them. Strategy, identity, websites, videos and promotion for businesses people want to recommend. Moscow, Dubai, Riyadh.',
+    '40ka: сорока на хвосте принесёт. Стратегия, айдентика, сайты, ролики и продвижение для бизнеса, который хотят рекомендовать.':
+        '40ka: a little bird told them. Strategy, identity, websites, videos and promotion for businesses people want to recommend.',
     '40ka — стратегия, бренд, продвижение': '40ka — strategy, brand, promotion',
     'Сорока на ветке и слова «Сорока на хвосте принесёт»': 'A magpie on a branch and the words “A little bird told them”',
     'ru_RU': 'en_US',
@@ -40,7 +40,7 @@ TR = {
         'We make brands that get talked about like that: strategy, identity, website and promotion.',
     'Стратегия, бренд и продвижение для бизнеса, который хотят рекомендовать.':
         'Strategy, brand and promotion for businesses people want to recommend.',
-    'Москва': 'Moscow', 'Дубай': 'Dubai', 'Эр-Рияд': 'Riyadh',
+    'Эр-Рияд': 'Riyadh',
     'Стратегия': 'Strategy', 'Айдентика': 'Identity', 'Упаковка': 'Packaging', 'Сайты': 'Websites',
     'Анимация': 'Animation', 'Ролики': 'Videos', 'Продвижение': 'Promotion', 'Арт-дирекшн': 'Art direction',
 
@@ -141,8 +141,8 @@ TR = {
         '40ka makes brands and launches them into the world: from strategy and identity to the website, videos and promotion. The name reads “soroka” — Russian for magpie, a bird that notices what is valuable and, unlike most, recognises itself in a mirror. Both matter to us: to see what is truly valuable in a business, and to make it recognise itself in its brand.',
     'Мы говорим с клиентом не о «красиво», а о том, как бренд влияет на выручку, цену и доверие.':
         'We talk to clients not about “pretty” but about how the brand affects revenue, price and trust.',
-    'Работаем с компаниями в Москве, Дубае и Эр-Рияде. Умеем работать с арабской и кириллической типографикой в одной системе.':
-        'We work with companies in Moscow, Dubai and Riyadh, and we can set Arabic and Cyrillic type in one system.',
+    'Работаем по всей России, от Москвы до Дагестана, а также с компаниями в Турции, Саудовской Аравии и Индонезии. Умеем соединять арабскую и кириллическую типографику в одной системе.':
+        'We work across Russia, from Moscow to Dagestan, and with companies in Turkey, Saudi Arabia and Indonesia. We can bring Arabic and Cyrillic type together in one system.',
 
     # ---------- cases: shared ----------
     'Сфера': 'Field', 'Где': 'Where', 'Сделали': 'What we did', 'Задача': 'The task', 'Решение': 'The solution',
@@ -244,6 +244,13 @@ def deeper(s):
     return re.sub(r'((?:src|href)=")((?:\.\./)?)(assets/|img/|favicon)', lambda m: m.group(1) + '../' + m.group(2) + m.group(3), s)
 
 
+# things that exist only in the English pages (Russian readers hear «сорока» in «40ka» by themselves)
+EN_ONLY = {
+    'index.html': [(r'(<p class="hero__def">.*?</p>)',
+                    r'\1\n      <p class="hero__def hero__def--name"><b>40ka</b> <i>[so-ró-ka]</i> <span>— Russian for magpie: “sorok” means forty. Hence the bird.</span></p>')],
+}
+
+
 def build():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     os.chdir(root)
@@ -271,6 +278,9 @@ def build():
         en = re.sub(r'<div class="lang">.*?</div>', '<div class="lang"><a href="%s" hreflang="ru" lang="ru">RU</a><b>EN</b></div>' % ru_link, en, count=1)
         en = en.replace('content="%s"' % ru_url, 'content="%s"' % en_url)
         if p == 'index.html': en = en.replace(BASE + 'img/og.png', BASE + 'img/og-en.png')
+        for pat, rep in EN_ONLY.get(p, []):
+            en, n = re.subn(pat, rep, en, count=1, flags=re.S)
+            if not n: print('EN_ONLY anchor not found in', p, pat); sys.exit(1)
         out['en/' + p] = en
     if missing:
         print('No English yet for:')
