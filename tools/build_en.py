@@ -34,6 +34,10 @@ TR = {
     # ---------- home: hero and ticker ----------
     # «Сорока на хвосте принесёт» — the Russian saying for news that spreads by itself; English has its own bird for it
     'Сорока': 'A little', 'на хвосте': 'bird', 'принесёт': 'told them',
+    'сорока на хвосте принесла': 'a little bird told me', 'разг.': 'informal',
+    '— так говорят о новости, которая разошлась сама.': '— said of news that has spread on its own.',
+    'Мы делаем бренды, о которых так рассказывают: стратегия, айдентика, сайт и продвижение.':
+        'We make brands that get talked about like that: strategy, identity, website and promotion.',
     'Стратегия, бренд и продвижение для бизнеса, который хотят рекомендовать.':
         'Strategy, brand and promotion for businesses people want to recommend.',
     'Москва': 'Moscow', 'Дубай': 'Dubai', 'Эр-Рияд': 'Riyadh',
