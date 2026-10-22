@@ -277,35 +277,62 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
 .band { padding-left: 0; padding-right: 0; }
 .band--dark { --ink: #FFFFFF; --ink-soft: #B9BBB8; --line: #3A3C3B; --bg: #000000; background: #000; color: #fff; border-top: 0; }
 .band--dark + .section { border-top: 0; }
-/* details: a strip of small things from the projects; it travels sideways as the page scrolls (site.js) */
+/* details: «the nest» — small things from the projects lie in a pile of prints, like a magpie's finds.
+   The top print can be tapped or swiped away (it slides back in under the pile); left alone, the pile turns over by itself.
+   Nothing here is tied to the scroll position, so there is nothing to lag behind the finger (assets/details.js). */
 .details { padding-block: clamp(44px, 7vw, 112px) clamp(48px, 8vw, 120px); overflow: hidden; }
-.details__strip { overflow: hidden; }
-.details__track { display: flex; align-items: flex-start; gap: clamp(12px, 1.4vw, 22px); width: max-content; padding-inline: max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter))); }
-/* scroll-driven: from the moment the strip appears at the bottom of the screen until it leaves at the top,
-   it travels from its first photo to its last (100vw - 100% = the part wider than the screen) */
-.details--css .details__track { animation: detailsRun linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
-@keyframes detailsRun { from { transform: translateX(0); } to { transform: translateX(calc(100vw - 100%)); } }
-.details__track figure { margin: 0; flex: none; }
-.details__track figure:nth-child(even) { margin-top: clamp(28px, 4vw, 64px); }
-.details__img { height: clamp(200px, 24vw, 340px); aspect-ratio: var(--ar, 3 / 2); overflow: hidden; background: var(--bg-deep); }
-.details__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.1s var(--ease); }
-.details__track figure:hover img { transform: scale(1.04); }
-.details figcaption { margin-top: 10px; font: 300 12px/1.3 var(--font-mono); text-transform: uppercase; letter-spacing: .03em; color: var(--ink-soft); }
-@media (max-width: 760px) { .details__img { height: 200px; } }
-@media (prefers-reduced-motion: reduce) { .details__strip { overflow-x: auto; } }
+.nest__grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: clamp(40px, 8vw, 132px); align-items: center; }
+.nest__side h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(26px, 3.2vw, 46px); line-height: 1.05; letter-spacing: -.02em; }
+.nest__side > p { margin-top: 18px; color: var(--ink-soft); max-width: 46ch; font-size: 16px; line-height: 1.5; }
+.nest__list { list-style: none; margin: clamp(28px, 3vw, 44px) 0 0; padding: 0; border-bottom: 1px solid var(--line); max-width: 520px; }
+.nest__list li { border-top: 1px solid var(--line); }
+.nest__list button { width: 100%; display: flex; gap: 16px; align-items: baseline; padding: 10px 0; text-align: left; color: var(--ink-soft); font-size: 15px; line-height: 1.4; transition: color .25s; }
+.nest__list button span { font: 300 11px/1 var(--font-mono); width: 20px; flex: none; }
+.nest__list button:hover, .nest__list button.on { color: var(--ink); }
+.nest__list button.on::after { content: ""; margin-left: auto; align-self: center; width: 22px; height: 1px; background: var(--ink); }
+.nest__pile { position: relative; height: clamp(360px, 38vw, 560px); touch-action: pan-y; cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; outline: none; }
+.nest__pile:focus-visible { outline: 2px solid var(--sheen-2); outline-offset: 6px; }
+.nest__pile figure { position: absolute; left: 50%; top: 50%; margin: 0; width: var(--w); aspect-ratio: var(--ar);
+  background: #fff; padding: clamp(6px, .6vw, 10px);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .06), 0 18px 34px -18px rgba(0, 0, 0, .35);
+  transform: translate(-50%, -50%) translate(var(--x), var(--y)) rotate(var(--r));
+  transition: transform .62s var(--ease-out), opacity .45s ease; transition-delay: var(--d, 0s); }
+.nest__pile figure.l { --w: 86%; } .nest__pile figure.p { --w: 50%; }
+.nest__pile img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-user-drag: none; }
+.nest__pile figure.out { transform: translate(-50%, -50%) translate(calc(var(--dx) * 118%), -5%) rotate(calc(var(--dx) * 13deg));
+  transition: transform .34s cubic-bezier(.45, 0, .85, .55); transition-delay: 0s; }
+.nest__pile figure.drag { transition: none; }
+.nest--js:not(.in) .nest__pile figure { opacity: 0; transform: translate(-50%, -50%) translate(var(--x), calc(var(--y) - 46%)) rotate(calc(var(--r) * -2.2)) scale(1.06); }
+.nest__cap { display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 16px; row-gap: 6px; margin-top: 18px;
+  font: 300 12px/1.3 var(--font-mono); text-transform: uppercase; letter-spacing: .03em; color: var(--ink-soft); }
+.nest__name { display: none; color: var(--ink); }
+.nest__n { order: 2; }
+.nest__hint { order: 1; }
+.nest__hint--touch { display: none; }
+@media (hover: none), (pointer: coarse) { .nest__hint--touch { display: inline; } .nest__hint--fine { display: none; } }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 760px) {
+  .nest__grid { grid-template-columns: 1fr; }
+  .nest__list { display: none; }
+  .nest__stage { margin-top: 26px; }
+  .nest__pile { height: 92vw; max-height: 420px; }
+  .nest__pile figure.l { --w: 88%; } .nest__pile figure.p { --w: 60%; }
+  .nest__name { display: block; order: 1; }
+  .nest__hint { order: 3; flex-basis: 100%; }
+}
 
 /* ---------- section heads ---------- */
 .section { padding-block: clamp(56px, 8vw, 128px); }
 .section + .section { border-top: 1px solid var(--line); }
 /* section heads sit on the same two-column grid as «Работы»: the title in the left column,
    the lead text starts exactly on the second column's edge and ends level with the title's last line */
-.section__head, .details__head {
+.section__head {
   display: grid; grid-template-columns: 1fr 1fr; column-gap: clamp(40px, 8vw, 132px); row-gap: 12px; align-items: end;
   margin-bottom: clamp(32px, 5vw, 72px);
 }
-.section__head h2, .details__head h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(26px, 3.2vw, 46px); line-height: 1.05; letter-spacing: -.02em; }
-.section__head p, .details__head p { color: var(--ink-soft); max-width: 46ch; font-size: 16px; line-height: 1.5; margin-bottom: .2em; }
-@media (max-width: 760px) { .section__head, .details__head { grid-template-columns: 1fr; } .section__head p, .details__head p { margin-bottom: 0; } }
+.section__head h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(26px, 3.2vw, 46px); line-height: 1.05; letter-spacing: -.02em; }
+.section__head p { color: var(--ink-soft); max-width: 46ch; font-size: 16px; line-height: 1.5; margin-bottom: .2em; }
+@media (max-width: 760px) { .section__head { grid-template-columns: 1fr; } .section__head p { margin-bottom: 0; } }
 
 /* scroll reveal: images open like a shutter */
 .js [data-reveal] { clip-path: inset(100% 0 0 0); }

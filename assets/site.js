@@ -63,7 +63,7 @@
     document.addEventListener('mousemove', function (e) {
       tx = e.clientX; ty = e.clientY;
       if (!body.classList.contains('cursor-on')) { cx = tx; cy = ty; body.classList.add('cursor-on'); }
-      var t = e.target.closest && e.target.closest('a, button');
+      var t = e.target.closest && e.target.closest('a, button, [data-cursor]');
       // a label inside the cursor says what a click will do: data-cursor, or "Смотреть" over a picture link
       var lab = t && (t.getAttribute('data-cursor') || (t.querySelector('img') ? W.view : ''));
       if (lab !== curLabel) { curLabel = lab; curText.textContent = lab || ''; }
@@ -77,7 +77,7 @@
     window.addEventListener('scroll', function () {
       if (!body.classList.contains('cursor-on')) return;
       var el = document.elementFromPoint(tx, ty);
-      var t = el && el.closest && el.closest('a, button');
+      var t = el && el.closest && el.closest('a, button, [data-cursor]');
       var lab = t && (t.getAttribute('data-cursor') || (t.querySelector('img') ? W.view : ''));
       if (lab !== curLabel) { curLabel = lab; curText.textContent = lab || ''; }
       body.classList.toggle('cursor-label', !!lab);
@@ -141,12 +141,6 @@
   var shelfItems = document.querySelectorAll('[data-drift]');
   var lastY = window.scrollY, ticking = false;
   var darkBands = document.querySelectorAll('.band--dark, .contact');
-  var detSec = document.getElementById('details'), detTrack = detSec && detSec.querySelector('.details__track');
-  // the strip drifts left as the page scrolls, on phones too. Where the browser can tie an animation to the scroll
-  // (CSS scroll-driven animations: Safari 26+, Chrome) it runs on the compositor, perfectly in step with the finger;
-  // elsewhere this script moves it.
-  var cssRun = window.CSS && CSS.supports && CSS.supports('animation-timeline: view()');
-  if (detSec && cssRun && !reduce) { detSec.classList.add('details--css'); detTrack = null; }
   function onScroll() {
     var y = window.scrollY, vh = window.innerHeight;
     body.classList.toggle('scrolled', y > 260);
@@ -176,16 +170,6 @@
         var lim = rr.height * .12; off = Math.max(-lim, Math.min(lim, off));
         el.style.transform = 'translateY(' + off.toFixed(1) + 'px)';
       });
-      if (detTrack) {
-        // the strip travels from its start to its end while the section crosses the screen
-        // (from the moment the strip shows at the bottom of the screen until it leaves at the top)
-        var dr2 = detTrack.getBoundingClientRect();
-        if (dr2.bottom > -100 && dr2.top < vh + 100) {
-          var span = Math.max(0, detTrack.scrollWidth - detSec.clientWidth);
-          var k = Math.max(0, Math.min(1, (vh - dr2.top) / (vh + dr2.height)));
-          detTrack.style.transform = 'translate3d(' + (-span * k).toFixed(1) + 'px,0,0)';
-        }
-      }
       if (cover) {
         var cr = cover.parentNode.getBoundingClientRect();
         var o = Math.max(-1, Math.min(1, (cr.top + cr.height / 2 - vh / 2) / vh));

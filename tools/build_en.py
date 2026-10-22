@@ -134,6 +134,9 @@ TR = {
     'Mosaik Travel: панама': 'Mosaik Travel: bucket hat', 'Нота: вывеска': 'Nota: sign',
     'Университет: бейдж': 'University: badge', 'Granada Coffee: фургон': 'Granada Coffee: van',
     'Kofio: стаканы и посуда': 'Kofio: cups and tableware', 'Университет: свитшот': 'University: sweatshirt',
+    'Нажмите на снимок или выберите в списке': 'Click the photo or pick one from the list',
+    'Нажмите или смахните снимок': 'Tap or swipe the photo',
+    'Стопка снимков: следующий': 'Pile of photos: next', 'Дальше': 'Next',
 
     # ---------- home: about ----------
     'Видим': 'We see', 'ценное': 'value', 'Делаем его': 'We make it', 'заметным': 'visible',
