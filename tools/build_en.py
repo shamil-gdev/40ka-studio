@@ -25,14 +25,15 @@ TR = {
         'One email is enough: who you are, what you want to change and by when. We reply within two working days.',
 
     # ---------- home: meta ----------
-    '40ka — бренды, о которых говорят. Стратегия, айдентика, сайты, ролики и продвижение для бизнеса, который хотят рекомендовать. Москва, Дубай, Эр-Рияд.':
-        '40ka — brands people talk about. Strategy, identity, websites, videos and promotion for businesses people want to recommend. Moscow, Dubai, Riyadh.',
+    '40ka: сорока на хвосте принесёт. Стратегия, айдентика, сайты, ролики и продвижение для бизнеса, который хотят рекомендовать. Москва, Дубай, Эр-Рияд.':
+        '40ka: a little bird told them. Strategy, identity, websites, videos and promotion for businesses people want to recommend. Moscow, Dubai, Riyadh.',
     '40ka — стратегия, бренд, продвижение': '40ka — strategy, brand, promotion',
-    'Сорока на ветке и слова «Бренды, о которых говорят»': 'A magpie on a branch and the words “Brands people talk about”',
+    'Сорока на ветке и слова «Сорока на хвосте принесёт»': 'A magpie on a branch and the words “A little bird told them”',
     'ru_RU': 'en_US',
 
     # ---------- home: hero and ticker ----------
-    'Бренды,': 'Brands', 'о которых': 'people', 'говорят': 'talk about',
+    # «Сорока на хвосте принесёт» — the Russian saying for news that spreads by itself; English has its own bird for it
+    'Сорока': 'A little', 'на хвосте': 'bird', 'принесёт': 'told them',
     'Стратегия, бренд и продвижение для бизнеса, который хотят рекомендовать.':
         'Strategy, brand and promotion for businesses people want to recommend.',
     'Москва': 'Moscow', 'Дубай': 'Dubai', 'Эр-Рияд': 'Riyadh',
