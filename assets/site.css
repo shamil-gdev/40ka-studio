@@ -211,6 +211,7 @@ body.flying .bird--hero .mp-legs { animation: none; opacity: 0; }
 .hero__def b { font-weight: 400; color: var(--ink); }
 .hero__def i { font-style: italic; }
 @keyframes defIn { from { opacity: 0; transform: translateY(10px); } }
+.hero__def--name { margin-top: 10px; animation-delay: .75s; }
 body.intro-wait .hero__def { animation-play-state: paused; }
 body.returning .hero__def { animation: quickIn .4s ease both; }
 @media (max-width: 760px) { .hero__def { font-size: 13px; } }
