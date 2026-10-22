@@ -17,7 +17,7 @@ TR = {
     # ---------- shared: header, menu, contact ----------
     'нажмите, чтобы пропустить': 'tap to skip',
     'Работы': 'Work', 'Услуги': 'Services', 'О студии': 'About', 'Контакт': 'Contact',
-    'Россия · Турция · Саудовская Аравия · Индонезия': 'Russia · Turkey · Saudi Arabia · Indonesia',
+    'Наверх ↑': 'Back to top ↑',
     '40ka — на главную': '40ka — home', 'Разделы': 'Sections', 'Меню': 'Menu',
     'Смотреть': 'View', 'Написать': 'Write', 'Скопировать': 'Copy', 'Мессенджеры': 'Messengers',
     'Расскажите о задаче.': 'Tell us about your project.',
@@ -141,8 +141,8 @@ TR = {
         '40ka makes brands and launches them into the world: from strategy and identity to the website, videos and promotion. The name reads “soroka” — Russian for magpie, a bird that notices what is valuable and, unlike most, recognises itself in a mirror. Both matter to us: to see what is truly valuable in a business, and to make it recognise itself in its brand.',
     'Мы говорим с клиентом не о «красиво», а о том, как бренд влияет на выручку, цену и доверие.':
         'We talk to clients not about “pretty” but about how the brand affects revenue, price and trust.',
-    'Работаем по всей России, от Москвы до Дагестана, а также с компаниями в Турции, Саудовской Аравии и Индонезии. Умеем соединять арабскую и кириллическую типографику в одной системе.':
-        'We work across Russia, from Moscow to Dagestan, and with companies in Turkey, Saudi Arabia and Indonesia. We can bring Arabic and Cyrillic type together in one system.',
+    'Работаем по всей России и по всему миру. Умеем соединять арабскую и кириллическую типографику в одной системе.':
+        'We work across Russia and around the world. We can bring Arabic and Cyrillic type together in one system.',
 
     # ---------- cases: shared ----------
     'Сфера': 'Field', 'Где': 'Where', 'Сделали': 'What we did', 'Задача': 'The task', 'Решение': 'The solution',

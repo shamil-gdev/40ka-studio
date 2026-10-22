@@ -67,21 +67,30 @@
   function wingsFrom(st, w) { st.wn = w; st.wf = { p: w.p * .9, th: w.th - 7, flex: w.flex, c: w.c, op: w.op }; }
   function heading(dx, dy, face) { return Math.hypot(dx, dy) > .5 ? Math.atan2(-dy, -face * dx) * 180 / Math.PI : 0; }
 
+  // keep a point where the whole bird can be seen: under the header bar and inside the screen
+  // (a fast flick on a phone would otherwise carry her off the top before she takes off,
+  //  and she would then come back from above instead of swooping down)
+  function onScreen(P, s) {
+    var vw = window.innerWidth, vh = window.innerHeight, b = barEl ? Math.max(0, barEl.getBoundingClientRect().bottom) : 0;
+    var x0 = (C[0] + 4) * s, x1 = vw - (VB_W - C[0] + 4) * s, y0 = b + (C[1] + 14) * s, y1 = vh - (VB_H - C[1] + 14) * s;
+    return [x0 < x1 ? clamp(P[0], x0, x1) : vw / 2, y0 < y1 ? clamp(P[1], y0, y1) : (y0 + y1) / 2];
+  }
   // branch -> logo. f.L0: launch point (screen) captured when she leaves the branch.
   function toLogo(t, f) {
     var st = base(), H = heroFrame(), G = logoFrame();
     if (t < TL.crouch) {
       // anticipation on the branch: crouch, tail up, wings lift
-      var k = sm(t / TL.crouch);
-      place(st, H.P, H.s);
+      var k = sm(t / TL.crouch), P0 = onScreen(H.P, H.s);
+      place(st, P0, H.s);
       st.bob = 7 * k; st.rot = -7 * k; st.tail = -10 * k; st.legS = 1 - .12 * k;
       st.plant = 1; st.toe = .25 * k; st.headLock = .7;                    // feet grip, knees bend, head stays
       var w = { p: lerp(.36, .62, k), th: lerp(98, 58, k), flex: lerp(10, 26, k), c: lerp(.38, .72, k), op: k > .3 ? 1 : 0 };
       wingsFrom(st, w); st.patch = 1 - sm(clamp(k * 2, 0, 1));
-      f.L0 = H.P; f.s0 = H.s;
+      f.L0 = P0; f.s0 = H.s;
       return st;
     }
-    var L0 = f.L0 || H.P, s0 = f.s0 || H.s, L1 = G.P;
+    if (!f.L0) { f.L0 = onScreen(H.P, H.s); f.s0 = H.s; }      // (a long first frame skipped the crouch)
+    var L0 = f.L0, s0 = f.s0, L1 = G.P;
     var dx = L1[0] - L0[0], dy = L1[1] - L0[1];
     // she drops off the branch and swoops down across the page, then rises into the logo:
     // the low point of the curve is kept inside the screen, so the whole flight can be followed
@@ -323,10 +332,18 @@
   function setClasses(name, on) { body.classList.toggle(name, !!on); }
 
   var barEl = document.getElementById('bar');
+  var darkBands = document.querySelectorAll('.band--dark, .contact');
   function ink(st) {
-    // over the dark version of the bar the magpie is drawn light, like the logo there
+    // over the dark version of the bar, and over the dark sections, the magpie is drawn light
+    // (like the logo there): black on black she would vanish mid-flight
     var cy = st.y + C[1] * st.s, b = barEl ? barEl.getBoundingClientRect() : null;
-    var dark = b && barEl.classList.contains('on-dark') && cy < b.bottom;
+    var dark = b && cy < b.bottom ? barEl.classList.contains('on-dark') : false;
+    if (!dark && !(b && cy < b.bottom)) {
+      for (var i = 0; i < darkBands.length; i++) {
+        var r = darkBands[i].getBoundingClientRect();
+        if (cy >= r.top && cy <= r.bottom) { dark = true; break; }
+      }
+    }
     if (dark) { svg.style.setProperty('--ink', '#fff'); svg.style.setProperty('--bg', '#000'); }
     else { svg.style.removeProperty('--ink'); svg.style.removeProperty('--bg'); }
   }
