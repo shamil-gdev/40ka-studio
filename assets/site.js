@@ -142,18 +142,11 @@
   var lastY = window.scrollY, ticking = false;
   var darkBands = document.querySelectorAll('.band--dark, .contact');
   var detSec = document.getElementById('details'), detTrack = detSec && detSec.querySelector('.details__track');
-  // touch screens swipe the strip themselves (no scroll-linked transform, which iOS paints badly); a mouse gets the drift
-  var fineMouse = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  if (detSec && !fineMouse) { detSec.classList.add('details--swipe'); detTrack = null; }
-  if (detSec && 'IntersectionObserver' in window) {
-    // load the strip's photos a little before it arrives (lazy loading and moving strips don't mix well in Safari)
-    var dio = new IntersectionObserver(function (es) {
-      if (!es[0].isIntersecting) return;
-      Array.prototype.forEach.call(detSec.querySelectorAll('img[loading="lazy"]'), function (im) { im.loading = 'eager'; });
-      dio.disconnect();
-    }, { rootMargin: '900px 0px' });
-    dio.observe(detSec);
-  }
+  // the strip drifts left as the page scrolls, on phones too. Where the browser can tie an animation to the scroll
+  // (CSS scroll-driven animations: Safari 26+, Chrome) it runs on the compositor, perfectly in step with the finger;
+  // elsewhere this script moves it.
+  var cssRun = window.CSS && CSS.supports && CSS.supports('animation-timeline: view()');
+  if (detSec && cssRun && !reduce) { detSec.classList.add('details--css'); detTrack = null; }
   function onScroll() {
     var y = window.scrollY, vh = window.innerHeight;
     body.classList.toggle('scrolled', y > 260);

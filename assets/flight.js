@@ -49,7 +49,7 @@
   }
 
   /* ---------- flight timelines ---------- */
-  var TL = { crouch: .14, flare: .94, contact: 1.1, end: 1.24, slotOpen: .38 };       // branch -> logo
+  var TL = { crouch: .14, flare: 1.2, contact: 1.38, end: 1.52, slotOpen: .62 };       // branch -> logo
   var TB = { turn: .18, flare: .98, legs: .9, contact: 1.2, fold: 1.42, turn2: 1.5, turn2End: 1.7, end: 1.95, slotClose: .46 }; // logo -> branch
 
   function base() {
@@ -83,8 +83,11 @@
     }
     var L0 = f.L0 || H.P, s0 = f.s0 || H.s, L1 = G.P;
     var dx = L1[0] - L0[0], dy = L1[1] - L0[1];
-    var c1 = [L0[0] + dx * .3, L0[1] + dy * .15 - 30];
-    var c2 = [L0[0] + dx * .75, L1[1] + Math.abs(dy) * .25 + 10];   // she rises into the logo at the end
+    // she drops off the branch and swoops down across the page, then rises into the logo:
+    // the low point of the curve is kept inside the screen, so the whole flight can be followed
+    var vh = window.innerHeight, y0 = Math.max(L0[1], 60);
+    var c1 = [L0[0] + dx * .05, Math.min(y0 + vh * .5, vh * .92)];
+    var c2 = [L0[0] + dx * .55, Math.min(y0 + vh * .42, vh * .9)];
     var tau = seg(t, TL.crouch, TL.contact);
     var q = .35 * tau + .65 * sm(tau);
     var P = bez(L0, c1, c2, L1, q), Pa = bez(L0, c1, c2, L1, clamp(q - .01, 0, 1)), Pb = bez(L0, c1, c2, L1, clamp(q + .01, 0, 1));
@@ -105,8 +108,11 @@
     // wings: strong beats, a short glide, the flare, then folded
     var w2;
     if (t < TL.flare) {
-      var u = (tl / .17) % 1, bi = Math.floor(tl / .17), amp = 1 - .7 * sm(seg(t, .62, .7)) * (1 - sm(seg(t, .78, .84)));
+      // the dive: wings half-closed and swept back; then strong beats up into the header
+      var dive = sm(seg(tau, .1, .2)) * (1 - sm(seg(tau, .4, .52)));
+      var u = (tl / .17) % 1, bi = Math.floor(tl / .17), amp = 1 - .8 * dive;
       w2 = M.flapPose(u, amp, bi); w2.op = 1;
+      w2 = { p: lerp(w2.p, .5, dive * .85), th: lerp(w2.th, 34, dive * .85), flex: lerp(w2.flex, 46, dive * .85), c: lerp(1, .82, dive * .85), op: 1 };
       st.bob = M.flapBob(u, amp);
       st.tail = -3.6 * Math.sin(2 * Math.PI * (u + .13));                // the tail steers a beat behind the wings
       st.patch = 0;
@@ -254,9 +260,16 @@
     }
     var L0 = f.L0 || A.P, s0 = f.s0 || A.s, L1 = B.P;
     var dx = L1[0] - L0[0], dy = L1[1] - L0[1], dist = Math.hypot(dx, dy);
-    var face = dx > 4 ? -1 : 1;
-    var up = Math.min(160, 50 + dist * .22);
-    var c1 = [L0[0] + dx * .28, L0[1] + dy * .1 - up], c2 = [L0[0] + dx * .78, L1[1] - up * .55];
+    var face = dx > 4 ? -1 : 1, vh = window.innerHeight, m = 50, c1, c2;
+    if (dy < 0) {
+      // up to the header: she drops a little first, then rises in a swoop
+      var low = clamp(L0[1] + Math.min(150, 40 + dist * .2), m, vh - m);
+      c1 = [L0[0] + dx * .18, low]; c2 = [L0[0] + dx * .72, clamp(L1[1] + Math.abs(dy) * .45, m, vh - m)];
+    } else {
+      // down from the header: a glide that comes in to land from just above the line
+      c1 = [L0[0] + dx * .35, clamp(L0[1] + Math.abs(dy) * .2, m, vh - m)];
+      c2 = [L0[0] + dx * .82, clamp(L1[1] - Math.min(90, Math.abs(dy) * .3), m, vh - m)];
+    }
     var tau = seg(t, LIFT, CONTACT), q = .3 * tau + .7 * sm(tau);
     var P = bez(L0, c1, c2, L1, q), Pa = bez(L0, c1, c2, L1, clamp(q - .01, 0, 1)), Pb = bez(L0, c1, c2, L1, clamp(q + .01, 0, 1));
     place(st, P, s0 * Math.pow(B.s / s0, sm(q)));
@@ -629,7 +642,7 @@
     if (!sec) return noop;
     // steps.js loads after this file: ask it lazily
     var S = {};
-    ['progress', 'rect', 'at', 'length', 'stepAt', 'count'].forEach(function (n) { S[n] = function (a, b) { return window.__steps[n](a, b); }; });
+    ['progress', 'drawn', 'rect', 'at', 'length', 'stepAt', 'count'].forEach(function (n) { S[n] = function (a, b) { return window.__steps[n](a, b); }; });
     S.mode = function () { return window.__steps ? window.__steps.mode() : null; };
     var W = { loc: null, face: -1, hop: null, last: 0, raf: null, idleAt: 0, gest: null };
     // while she is on the line she is drawn inside the section itself, so she rides the page's own scroll
@@ -666,11 +679,26 @@
       }
       return null;
     }
-    function wanted() {
+    function zone() {
       var m = S.mode(); if (!m) return false;
       var r = S.rect(), vh = window.innerHeight, on = state === 'line';     // a wider zone to stay than to come
       if (m === 'desk') return on ? (r.top < vh * .84 && r.top > vh * .16) : (r.top < vh * .72 && r.top > vh * .22);
       return on ? (r.top < vh * .66 && r.bottom > vh * .22) : (r.top < vh * .55 && r.bottom > vh * .32);
+    }
+    // she only comes down when the visitor is actually reading here: in the zone for a moment, not flying past
+    var zoneT = 0, dwellT = null, sp = { y: window.scrollY, t: performance.now(), v: 0 };
+    window.addEventListener('scroll', function () {
+      var now = performance.now(), dt = Math.max(1, now - sp.t);
+      sp.v = .6 * sp.v + .4 * Math.abs(window.scrollY - sp.y) / dt * 1000; sp.y = window.scrollY; sp.t = now;
+    }, { passive: true });
+    function speed() { return performance.now() - sp.t > 160 ? 0 : sp.v; }
+    function wanted() {
+      var z = zone();
+      if (state === 'line') return z;
+      if (!z) { zoneT = 0; return false; }
+      var now = performance.now(); if (!zoneT) zoneT = now;
+      if (now - zoneT < 550 || speed() > 650) { clearTimeout(dwellT); dwellT = setTimeout(check, 620); return false; }
+      return true;
     }
     function dist(a, b) { var A = pt(a), B = pt(b); return A && B ? Math.hypot(B[0] - A[0], B[1] - A[1]) : 0; }
 
@@ -697,8 +725,42 @@
       }
       return st;
     }
+    /* when the line is taken away from under her (the visitor scrolls back), she does not stand on air:
+       she lifts off and hovers, flying back after the pen, and lands again where the line still is */
+    function airState(A, now) {
+      var F = frameAt({ p: A.p }), st = base(), tt = (now - A.t0) / 1000;
+      var k = clamp(A.h / 14, 0, 1), land = 1 - k;                       // k: 1 flying, 0 touching down
+      place(st, [F.P[0], F.P[1] - A.h + 2.5 * Math.sin(tt * 5.5) * k], F.s);
+      st.flip = W.face;
+      var u = (tt / .16) % 1, bi = Math.floor(tt / .16), w = M.flapPose(u, 1, bi), lw = land * .9;
+      wingsFrom(st, { p: lerp(w.p, .96, lw), th: lerp(w.th, -20, lw), flex: lerp(w.flex, -4, lw), c: 1, op: 1 });
+      st.patch = 0;
+      st.bob = M.flapBob(u, k);
+      st.rot = -7 * clamp(Math.abs(A.v) * (S.length() || 1) / 420, 0, 1) * k + 12 * land;
+      st.legOp = 1; st.legRot = lerp(-50, 16, land); st.legS = lerp(.55, 1, land); st.plant = 0; st.toe = -.25 * land;
+      st.tail = -3.6 * Math.sin(2 * Math.PI * (u + .13)) * k + 14 * land; st.fan = .8 * land;
+      st.headLock = .7;
+      return st;
+    }
+    function airTick(now, tg) {
+      var A = W.air, dt = Math.min(.05, (now - A.last) / 1000), L = S.length() || 1; A.last = now;
+      var drawn = S.drawn(), dp = tg.p - A.p, maxV = 430 / L;
+      var step = clamp(dp, -maxV * dt, maxV * dt); A.v = step / Math.max(dt, 1e-3); A.p += step;
+      if (Math.abs(dp) * L > 3) W.face = dp > 0 ? -1 : 1;
+      var down = A.p <= drawn - 2 / L && Math.abs(tg.p - A.p) * L < 8;
+      A.h += ((down ? 0 : 30) - A.h) * Math.min(1, dt * (down ? 5 : 7));
+      W.loc = { p: A.p };
+      if (down && A.h < .7) { W.air = null; W.landT = now; W.idleAt = now; }
+    }
     function standState(now) {
       var F = frameAt(W.loc), st = base(); place(st, F.P, F.s); st.flip = W.face; st.plant = 1; st.headLock = .75;
+      if (W.landT && now - W.landT < 440) {                              // just landed: the wings fold, the tail settles
+        var fk = eio((now - W.landT) / 440);
+        var fw = { p: lerp(.96, .36, fk), th: lerp(-20, 98, fk), flex: lerp(-4, 10, fk), c: lerp(1, .38, fk) };
+        st.patch = eo(seg(fk, .75, 1)); fw.op = st.patch > .55 ? 0 : 1; wingsFrom(st, fw);
+        st.tail = 14 * (1 - fk) - 6 * wobble((now - W.landT) / 1000, 4, 9); st.rot = 8 * wobble((now - W.landT) / 1000, 2.6, 6);
+        return st;
+      }
       var g = W.gest, gt = g ? (now - g.t0) / 1000 : 9;
       if (g && gt < g.dur) {
         if (g.kind === 'peck') { var pk = Math.max(Math.sin(Math.PI * clamp(gt / .2, 0, 1)), Math.sin(Math.PI * clamp((gt - .3) / .2, 0, 1))); st.rot = -16 * pk; st.headLock = .2; st.tail = 5 * pk; }
@@ -713,7 +775,15 @@
       if (W.hop) {
         if (now - W.hop.t0 >= W.hop.dur) { W.loc = W.hop.to; W.face = W.hop.face; W.hop = null; W.idleAt = now; }
       }
-      if (!W.hop) {
+      // desktop: no line under her feet (or already in the air) -> she flies
+      if (!W.hop && S.mode() === 'desk' && W.loc && W.loc.p != null) {
+        var drawnNow = S.drawn(), Lw = S.length() || 1;
+        if (!W.air && W.loc.p > drawnNow + 3 / Lw) W.air = { p: W.loc.p, h: 0, t0: now, last: now, v: 0 };
+      }
+      if (W.air) {
+        var tga = target(); if (tga) airTick(now, tga);
+      }
+      if (!W.hop && !W.air) {
         var tg = target();
         if (tg) {
           var d = dist(W.loc, tg), m = S.mode();
@@ -729,7 +799,8 @@
           }
         }
       }
-      if (W.hop) st = hopState(W.hop, now);
+      if (W.air) st = airState(W.air, now);
+      else if (W.hop) st = hopState(W.hop, now);
       else {
         if (!W.gest && now - W.idleAt > 2600 + Math.random() * 2600) { W.gest = { kind: Math.random() < .5 ? 'peck' : 'pump', t0: now, dur: .9 }; W.idleAt = now; }
         if (W.gest && (now - W.gest.t0) / 1000 > W.gest.dur) W.gest = null;
@@ -741,15 +812,17 @@
       W.raf = requestAnimationFrame(tickWalk);
     }
     return {
+      debug: function () { return { loc: W.loc, air: W.air && { p: W.air.p, h: W.air.h }, hop: !!W.hop, face: W.face, drawn: S.drawn && S.mode() ? S.drawn() : null, target: S.mode() ? target() : null, L: S.mode() === 'desk' ? S.length() : 0 }; },
       wanted: wanted,
       start: function () {
         inPage(); show(true); layer.classList.remove('on');
         W.idleAt = performance.now(); if (!W.raf) tickWalk(performance.now());
       },
-      stop: function () { if (W.raf) cancelAnimationFrame(W.raf); W.raf = null; W.hop = null; W.gest = null; show(false); },
+      stop: function () { if (W.raf) cancelAnimationFrame(W.raf); W.raf = null; W.hop = null; W.gest = null; W.air = null; W.landT = 0; show(false); },
       // logo -> line: she lands where the pen is now
       flightIn: function (face, off) {
-        W.loc = target() || { p: .05 }; W.hop = null;
+        W.loc = target() || { p: .05 }; W.hop = null; W.air = null; W.landT = 0;
+        if (W.loc.p != null) W.loc.p = Math.max(.03, Math.min(W.loc.p, S.drawn() - 30 / (S.length() || 1)));   // where the line already is
         var to = W.loc, f = { dur: 1.15, startFace: face || 1 };
         f.from = function () { var G = logoFrame(); return { P: [G.P[0] + (off ? off[0] : 0), G.P[1] + (off ? off[1] : 0)], s: G.s }; };
         f.to = function () { return frameAt(to); };
@@ -758,9 +831,9 @@
       },
       // line -> logo
       flightOut: function () {
-        var from = W.hop ? W.hop.to : W.loc, f = { dur: 1.05, startFace: W.face };
-        if (W.raf) cancelAnimationFrame(W.raf); W.raf = null; W.hop = null; show(false);
-        f.from = function () { return frameAt(from); };
+        var from = W.hop ? W.hop.to : W.loc, f = { dur: 1.05, startFace: W.face }, lift = W.air ? W.air.h : 0;
+        if (W.raf) cancelAnimationFrame(W.raf); W.raf = null; W.hop = null; W.air = null; show(false);
+        f.from = function () { var F = frameAt(from); return { P: [F.P[0], F.P[1] - lift], s: F.s }; };
         f.to = function () { return logoFrame(); };
         return f;
       }
@@ -771,12 +844,16 @@
   window.__flight = {
     renderAt: function (kind, t) {
       var f = {};
+      if (kind === 'toLine' || kind === 'lineToLogo') {
+        if (t === 0 || !this._f) this._f = kind === 'toLine' ? guide.flightIn(1, [0, 0]) : guide.flightOut();
+        layer.classList.add('on'); frame(kind, t, this._f); return;
+      }
       // replay the launch capture so endpoints match a real run
       if (kind === 'toLogo') toLogo(Math.min(t, TL.crouch - 1e-3), f); else toBranch(Math.min(t, TB.turn - 1e-3), f);
       layer.classList.add('on');
       frame(kind, t, f);
     },
-    settle: settle, T: { toLogo: TL, toBranch: TB }, state: function () { return state; }
+    settle: settle, T: { toLogo: TL, toBranch: TB }, state: function () { return state; }, guide: function () { return guide.debug(); }
   };
   // wait until she has arrived on the branch (after the intro or the short arrival)
   (function waitReady() {
