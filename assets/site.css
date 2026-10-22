@@ -205,6 +205,15 @@ body.flying .bird--hero .mp-legs { animation: none; opacity: 0; }
   font-size: 15px; color: var(--ink-soft); max-width: 42ch; margin-bottom: clamp(24px, 4vw, 48px);
   padding-left: 18px; border-left: 1px solid var(--line);
 }
+/* under the headline, a dictionary entry explains the saying */
+.hero__def { margin-top: clamp(18px, 2.2vw, 30px); max-width: 44ch; font: 300 15px/1.55 var(--font-mono); color: var(--ink-soft); letter-spacing: 0;
+  animation: defIn 1s .55s var(--ease) both; }
+.hero__def b { font-weight: 400; color: var(--ink); }
+.hero__def i { font-style: italic; }
+@keyframes defIn { from { opacity: 0; transform: translateY(10px); } }
+body.intro-wait .hero__def { animation-play-state: paused; }
+body.returning .hero__def { animation: quickIn .4s ease both; }
+@media (max-width: 760px) { .hero__def { font-size: 13px; } }
 .hero__title {
   font-family: var(--font-display); font-weight: 300;
   font-size: clamp(38px, 7.2vw, 122px); line-height: 1; letter-spacing: -.025em;
