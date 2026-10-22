@@ -139,6 +139,18 @@
   var lastY = window.scrollY, ticking = false;
   var darkBands = document.querySelectorAll('.band--dark, .contact');
   var detSec = document.getElementById('details'), detTrack = detSec && detSec.querySelector('.details__track');
+  // touch screens swipe the strip themselves (no scroll-linked transform, which iOS paints badly); a mouse gets the drift
+  var fineMouse = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (detSec && !fineMouse) { detSec.classList.add('details--swipe'); detTrack = null; }
+  if (detSec && 'IntersectionObserver' in window) {
+    // load the strip's photos a little before it arrives (lazy loading and moving strips don't mix well in Safari)
+    var dio = new IntersectionObserver(function (es) {
+      if (!es[0].isIntersecting) return;
+      Array.prototype.forEach.call(detSec.querySelectorAll('img[loading="lazy"]'), function (im) { im.loading = 'eager'; });
+      dio.disconnect();
+    }, { rootMargin: '900px 0px' });
+    dio.observe(detSec);
+  }
   function onScroll() {
     var y = window.scrollY, vh = window.innerHeight;
     body.classList.toggle('scrolled', y > 260);

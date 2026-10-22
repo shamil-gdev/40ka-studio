@@ -81,6 +81,8 @@
   };
 
   /* ---------- rig ---------- */
+  // phones and tablets: no SVG motion blur (a filter on a moving drawing is expensive for mobile GPUs)
+  var NOBLUR = !(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
   var C = [190, 95];      // body pivot (pitch)
   var NECK = [138, 58];   // head pivot
   var SHOULDER_N = [214, 60], SHOULDER_F = [190, 50];
@@ -217,7 +219,7 @@
         var ba = st.blurAng || 0;
         blurWrap.setAttribute('transform', 'rotate(' + ba.toFixed(1) + ' ' + C[0] + ' ' + C[1] + ')');
         blurInner.setAttribute('transform', 'rotate(' + (-ba).toFixed(1) + ' ' + C[0] + ' ' + C[1] + ')');
-        if (st.blur > .05) { blurWrap.setAttribute('filter', 'url(#' + blurId + ')'); st.blurNode && st.blurNode.setAttribute('stdDeviation', st.blur.toFixed(2) + ' 0'); }
+        if (st.blur > .05 && !NOBLUR) { blurWrap.setAttribute('filter', 'url(#' + blurId + ')'); st.blurNode && st.blurNode.setAttribute('stdDeviation', st.blur.toFixed(2) + ' 0'); }
         else blurWrap.removeAttribute('filter');
         pose.setAttribute('transform', 'rotate(' + st.rot.toFixed(2) + ' ' + C[0] + ' ' + C[1] + ')');
         bob.setAttribute('transform', 'translate(0 ' + (st.bob || 0).toFixed(2) + ')');
