@@ -11,9 +11,11 @@
 
   /* ---------- 1. inertia ---------- */
   var lenis = null;
-  if (!reduce && window.Lenis) {
+  // only for a mouse wheel: touch screens keep their own native momentum scroll (and iOS must not be fought)
+  var wheel = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (!reduce && wheel && window.Lenis) {
     lenis = new window.Lenis({ lerp: .095, wheelMultiplier: .95, smoothWheel: true, syncTouch: false });
-    html.classList.add('has-lenis');
+    html.classList.add('wheel-smooth');   // (not a 'lenis…' name: Lenis strips those from <html>)
     var stopped = false;
     (function raf(t) {
       // hold still while the intro plays or the menu is open
@@ -71,34 +73,33 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(ready); else ready();
   }
 
-  /* ---------- 3. «О студии» is read along ---------- */
-  var readBox = document.querySelector('.about__text'), words = [];
-  if (readBox && !reduce) {
-    Array.prototype.forEach.call(readBox.querySelectorAll('p'), function (p) {
-      var parts = p.textContent.split(/(\s+)/);
+  /* ---------- 3. «О студии»: each paragraph is "read" once as it arrives — the ink runs through its words
+     (CSS transitions with staggered delays, nothing runs per frame, and nothing stays grey) ---------- */
+  var readBox = document.querySelector('.about__text');
+  if (readBox && !reduce && 'IntersectionObserver' in window) {
+    var paras = Array.prototype.slice.call(readBox.querySelectorAll('p'));
+    paras.forEach(function (p) {
+      var parts = p.textContent.split(/(\s+)/), n = 0;
       p.textContent = '';
       parts.forEach(function (w) {
         if (!w) return;
         if (/^\s+$/.test(w)) { p.appendChild(document.createTextNode(w)); return; }
-        var s = document.createElement('span'); s.className = 'rw'; s.textContent = w; p.appendChild(s); words.push(s);
+        var sp = document.createElement('span'); sp.className = 'rw'; sp.textContent = w;
+        sp.style.transitionDelay = (Math.min(n, 60) * 28) + 'ms'; n++;
+        p.appendChild(sp);
       });
     });
     readBox.classList.add('reading');
-  }
-  var lit = 0;                                            // how many words are already in ink
-  function read(vh) {
-    if (!words.length) return;
-    var r = readBox.getBoundingClientRect();
-    // the ink line runs a little ahead of the eye: it starts when the text is at 74% of the screen
-    var k = clamp((vh * .74 - r.top) / (r.height * .9 + vh * .1), 0, 1);
-    var n = Math.round(k * words.length);
-    if (n === lit) return;
-    for (var i = Math.min(n, lit); i < Math.max(n, lit); i++) words[i].classList.toggle('on', i < n);
-    lit = n;
+    var rio = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('read'); rio.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -18% 0px', threshold: .3 });
+    paras.forEach(function (p) { rio.observe(p); });
   }
 
   /* ---------- 4. depth in the work photos ---------- */
-  var photos = reduce ? [] : Array.prototype.slice.call(document.querySelectorAll('.work figure'));
+  // on touch screens the page scrolls on its own thread: effects moved by script would lag behind it, so they stay still
+  var touch = !wheel;
+  var photos = reduce || touch ? [] : Array.prototype.slice.call(document.querySelectorAll('.work figure'));
   function depth(vh) {
     photos.forEach(function (f) {
       var r = f.getBoundingClientRect();
@@ -112,7 +113,7 @@
   var cards = Array.prototype.slice.call(document.querySelectorAll('.cards .card'));
   cards.forEach(function (c, i) { c.style.setProperty('--i', i); });
   function stack() {
-    if (reduce) return;
+    if (reduce || touch) return;
     for (var i = 0; i < cards.length - 1; i++) {
       var a = cards[i].getBoundingClientRect(), b = cards[i + 1].getBoundingClientRect();
       var k = clamp(1 - (b.top - a.top) / Math.max(1, a.height), 0, 1);
@@ -124,7 +125,7 @@
   function frame() {
     ticking = false;
     var vh = window.innerHeight;
-    read(vh); depth(vh); stack();
+    depth(vh); stack();
   }
   function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }
   window.addEventListener('scroll', onScroll, { passive: true });

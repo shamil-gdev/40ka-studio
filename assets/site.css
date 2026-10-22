@@ -28,7 +28,7 @@
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-html.has-lenis { scroll-behavior: auto; }
+html.wheel-smooth, html.lenis { scroll-behavior: auto; }
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-stopped { overflow: clip; }
 body {
@@ -271,7 +271,11 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
 .details__head h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 3.4vw, 48px); letter-spacing: -.02em; }
 .details__head p { font-size: 15px; color: var(--ink-soft); max-width: 44ch; }
 .details__strip { overflow: hidden; }
-.details__track { display: flex; align-items: flex-start; gap: clamp(12px, 1.4vw, 22px); width: max-content; padding-inline: max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter))); will-change: transform; }
+.details__track { display: flex; align-items: flex-start; gap: clamp(12px, 1.4vw, 22px); width: max-content; padding-inline: max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter))); }
+/* touch screens: the strip is swiped by hand */
+.details--swipe .details__strip { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.details--swipe .details__strip::-webkit-scrollbar { display: none; }
+.details--swipe .details__track figure { scroll-snap-align: start; scroll-margin-left: var(--gutter); }
 .details__track figure { margin: 0; flex: none; }
 .details__track figure:nth-child(even) { margin-top: clamp(28px, 4vw, 64px); }
 .details__img { height: clamp(200px, 24vw, 340px); aspect-ratio: var(--ar, 3 / 2); overflow: hidden; background: var(--bg-deep); }
@@ -369,8 +373,8 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
 .h-mask .hl { display: block; overflow: hidden; padding-bottom: .08em; margin-bottom: -.08em; }
 .h-mask .hl > span { display: block; transform: translateY(108%); transition: transform 1.05s var(--ease); }
 .h-mask.h-in .hl > span { transform: none; }
-.reading .rw { opacity: .22; transition: opacity .4s ease; }
-.reading .rw.on { opacity: 1; }
+.reading .rw { opacity: .2; transition: opacity .5s ease; }
+.reading .read .rw { opacity: 1; }
 /* soft passages into and out of the dark blocks */
 .fade { height: clamp(90px, 16vh, 170px); }
 .fade--down { background: linear-gradient(to bottom, var(--bg), #000); }

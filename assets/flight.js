@@ -340,7 +340,7 @@
   }
   function settle(where) {
     state = where; flight = null;
-    if (where === 'line') { layer.classList.add('on'); setClasses('bird-flying', false); setClasses('bird-inbound', true); setClasses('bird-away', true); setClasses('bird-logo', false); guide.start(); return; }
+    if (where === 'line') { setClasses('bird-flying', false); setClasses('bird-inbound', true); setClasses('bird-away', true); setClasses('bird-logo', false); guide.start(); return; }
     guide.stop();
     layer.classList.remove('on');
     setClasses('bird-flying', false);
@@ -632,6 +632,16 @@
     ['progress', 'rect', 'at', 'length', 'stepAt', 'count'].forEach(function (n) { S[n] = function (a, b) { return window.__steps[n](a, b); }; });
     S.mode = function () { return window.__steps ? window.__steps.mode() : null; };
     var W = { loc: null, face: -1, hop: null, last: 0, raf: null, idleAt: 0, gest: null };
+    // while she is on the line she is drawn inside the section itself, so she rides the page's own scroll
+    // (no lag behind momentum scrolling); only the flights in and out use the overlay above the page
+    var stepsEl = document.getElementById('steps'), gsvg = null, grig = null;
+    function inPage() {
+      if (gsvg || !stepsEl) return;
+      gsvg = el('svg', { xmlns: 'http://www.w3.org/2000/svg', 'class': 'guide-layer', 'aria-hidden': 'true' }, stepsEl);
+      gsvg.setAttribute('style', 'position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:3;display:none;color:var(--ink)');
+      grig = M.buildRig(gsvg, hero, { prefix: 'guide', blurId: 'guideNoBlur' });
+    }
+    function show(on) { if (gsvg) gsvg.style.display = on ? '' : 'none'; }
     function bs() { return (S.mode() === 'mob' ? 76 : 100) / VB_W; }
     // where she stands: desktop {p}, phones {i}; returns the screen point of her feet on the line
     function pt(loc) {
@@ -725,13 +735,18 @@
         if (W.gest && (now - W.gest.t0) / 1000 > W.gest.dur) W.gest = null;
         st = standState(now);
       }
-      size(); rig.set(st); ink(st);
+      var G = gsvg.getBoundingClientRect();
+      st.x -= G.left; st.y -= G.top;                       // into the section's own coordinates
+      grig.set(st);
       W.raf = requestAnimationFrame(tickWalk);
     }
     return {
       wanted: wanted,
-      start: function () { W.idleAt = performance.now(); if (!W.raf) W.raf = requestAnimationFrame(tickWalk); },
-      stop: function () { if (W.raf) cancelAnimationFrame(W.raf); W.raf = null; W.hop = null; W.gest = null; },
+      start: function () {
+        inPage(); show(true); layer.classList.remove('on');
+        W.idleAt = performance.now(); if (!W.raf) tickWalk(performance.now());
+      },
+      stop: function () { if (W.raf) cancelAnimationFrame(W.raf); W.raf = null; W.hop = null; W.gest = null; show(false); },
       // logo -> line: she lands where the pen is now
       flightIn: function (face, off) {
         W.loc = target() || { p: .05 }; W.hop = null;
@@ -744,7 +759,7 @@
       // line -> logo
       flightOut: function () {
         var from = W.hop ? W.hop.to : W.loc, f = { dur: 1.05, startFace: W.face };
-        if (W.raf) cancelAnimationFrame(W.raf); W.raf = null; W.hop = null;
+        if (W.raf) cancelAnimationFrame(W.raf); W.raf = null; W.hop = null; show(false);
         f.from = function () { return frameAt(from); };
         f.to = function () { return logoFrame(); };
         return f;
