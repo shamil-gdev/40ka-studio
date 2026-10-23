@@ -227,7 +227,8 @@ body.returning .hero__def { animation: quickIn .4s ease both; }
   font-size: calc(clamp(38px, 7.2vw, 122px) * var(--dk)); line-height: .98; letter-spacing: var(--dls);
   max-width: 14ch;
 }
-.hero__title .l { display: block; overflow: hidden; padding-bottom: .06em; margin-bottom: -.06em; }
+/* line masks: the box is widened sideways because Gros Ventre letters (A, t, y, Ъ…) overhang their left edge */
+.hero__title .l { display: block; overflow: hidden; padding: 0 .15em .06em; margin: 0 -.15em -.06em; }
 .hero__title .l > span { display: block; animation: lineUp 1.1s var(--ease) both; }
 .hero__title .l:nth-child(2) > span { animation-delay: .12s }
 .hero__title .l:nth-child(3) > span { animation-delay: .24s }
@@ -415,7 +416,7 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
 .card__more[open] .card__body { animation: cardOpen .5s var(--ease) both; }
 @keyframes cardOpen { from { opacity: 0; transform: translateY(-6px); } }
 @media (max-width: 900px) { .card { grid-template-columns: 1fr; grid-template-areas: "top" "title" "body"; top: calc(84px + var(--i, 0) * 12px); min-height: 0; } .card h3 { padding-top: 40px; } .card__side { margin-top: 4px; } }
-.h-mask .hl { display: block; overflow: hidden; padding-bottom: .08em; margin-bottom: -.08em; }
+.h-mask .hl { display: block; overflow: hidden; padding: 0 .15em .08em; margin: 0 -.15em -.08em; }
 .h-mask .hl > span { display: block; transform: translateY(108%); transition: transform 1.05s var(--ease); }
 .h-mask.h-in .hl > span { transform: none; }
 .reading .rw { opacity: .2; transition: opacity .5s ease; }
@@ -516,7 +517,7 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
 /* ---------- case pages ---------- */
 .case-hero { padding-block: clamp(40px, 7vw, 96px) clamp(24px, 4vw, 48px); display: grid; grid-template-columns: 2fr 1fr; gap: 32px; align-items: end; }
 .case-hero h1 { font-family: var(--font-display); font-weight: 300; font-size: calc(clamp(36px, 6vw, 96px) * var(--dk)); letter-spacing: var(--dls); line-height: 1.02; }
-.case-hero h1 .l { display: block; overflow: hidden; padding-bottom: .08em; margin-bottom: -.08em; }
+.case-hero h1 .l { display: block; overflow: hidden; padding: 0 .15em .08em; margin: 0 -.15em -.08em; }
 .case-hero h1 .l > span { display: block; animation: lineUp 1.1s var(--ease) both; }
 .case-hero .ar { display: block; font-family: var(--font-body); font-weight: 400; font-size: .5em; color: var(--ink-soft); margin-top: .3em; letter-spacing: 0; animation: fadeIn .8s .4s both; }
 .case-meta { display: grid; gap: 14px; font-size: 14px; animation: fadeIn .8s .5s both; }
