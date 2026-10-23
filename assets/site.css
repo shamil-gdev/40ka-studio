@@ -1,6 +1,8 @@
 /* 40ka — studio site
    Layout: a quiet gallery. Stone-white ground, black ink, magpie-feather sheen as the only colour of our own.
    Display face is wide and calm; the work supplies the colour. */
+@font-face { font-family: 'Gros Ventre'; font-weight: 300; font-style: normal; font-display: swap; src: url('fonts/GrosVentre-Light.woff2') format('woff2'); }
+@font-face { font-family: 'Gros Ventre'; font-weight: 400; font-style: normal; font-display: swap; src: url('fonts/GrosVentre-Regular.woff2') format('woff2'); }
 :root {
   --bg: #ECECE8;
   --bg-deep: #DEDEDA;
@@ -11,8 +13,11 @@
   --sheen-1: #5FD3C4;   /* magpie wing: teal */
   --sheen-2: #6A7CFF;   /* magpie tail: blue-violet */
   --sheen-3: #B48CFF;   /* iridescent violet */
-  --font-logo: 'Unbounded', 'Arial Black', system-ui, sans-serif;
-  --font-display: 'Unbounded', 'Arial Black', system-ui, sans-serif;
+  --font-logo: system-ui, sans-serif; /* the wordmark is drawn (svg); this only sets the em it is sized from */
+  /* headings: Gros Ventre by Dimitri Antonov / Blue Curve Designstudio, CC BY 4.0 (assets/fonts, credited in the footer) */
+  --font-display: 'Gros Ventre', 'Helvetica Neue', Arial, system-ui, sans-serif;
+  --dk: 1.15;        /* Gros Ventre is narrower than the former face: the heading sizes are scaled to keep the line lengths */
+  --dls: -.01em;
   --font-body: 'Golos Text', 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
   --gutter: max(16px, env(safe-area-inset-left, 0px));
@@ -154,7 +159,7 @@ body.menu-open .burger i:nth-child(2) { transform: rotate(-45deg); }
 }
 body.menu-open .menu { clip-path: inset(0 0 0 0); pointer-events: auto; }
 .menu__links { display: grid; gap: 10px; }
-.menu__links a { font-family: var(--font-display); font-weight: 300; font-size: clamp(32px, 9vw, 52px); line-height: 1.1; letter-spacing: -.02em; opacity: 0; transform: translateY(16px); transition: opacity .5s, transform .6s var(--ease); }
+.menu__links a { font-family: var(--font-display); font-weight: 300; font-size: calc(clamp(32px, 9vw, 52px) * var(--dk)); line-height: 1.1; letter-spacing: var(--dls); opacity: 0; transform: translateY(16px); transition: opacity .5s, transform .6s var(--ease); }
 body.menu-open .menu__links a { opacity: 1; transform: none; }
 body.menu-open .menu__links a:nth-child(2) { transition-delay: .06s } body.menu-open .menu__links a:nth-child(3) { transition-delay: .12s } body.menu-open .menu__links a:nth-child(4) { transition-delay: .18s }
 .menu__foot { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: #9A9C99; }
@@ -219,7 +224,7 @@ body.returning .hero__def { animation: quickIn .4s ease both; }
 @media (max-width: 760px) { .hero__def { font-size: 13px; } }
 .hero__title {
   font-family: var(--font-display); font-weight: 300;
-  font-size: clamp(38px, 7.2vw, 122px); line-height: 1; letter-spacing: -.025em;
+  font-size: calc(clamp(38px, 7.2vw, 122px) * var(--dk)); line-height: .98; letter-spacing: var(--dls);
   max-width: 14ch;
 }
 .hero__title .l { display: block; overflow: hidden; padding-bottom: .06em; margin-bottom: -.06em; }
@@ -284,7 +289,7 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
    Nothing here is tied to the scroll position, so there is nothing to lag behind the finger (assets/details.js). */
 .details { padding-block: clamp(44px, 7vw, 112px) clamp(48px, 8vw, 120px); overflow: hidden; }
 .nest__grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: clamp(40px, 8vw, 132px); align-items: center; }
-.nest__side h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(26px, 3.2vw, 46px); line-height: 1.05; letter-spacing: -.02em; }
+.nest__side h2 { font-family: var(--font-display); font-weight: 400; font-size: calc(clamp(26px, 3.2vw, 46px) * var(--dk)); line-height: 1.05; letter-spacing: var(--dls); }
 .nest__side > p { margin-top: 18px; color: var(--ink-soft); max-width: 46ch; font-size: 16px; line-height: 1.5; }
 .nest__list { list-style: none; margin: clamp(28px, 3vw, 44px) 0 0; padding: 0; border-bottom: 1px solid var(--line); max-width: 520px; }
 .nest__list li { border-top: 1px solid var(--line); }
@@ -332,7 +337,7 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
   display: grid; grid-template-columns: 1fr 1fr; column-gap: clamp(40px, 8vw, 132px); row-gap: 12px; align-items: end;
   margin-bottom: clamp(32px, 5vw, 72px);
 }
-.section__head h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(26px, 3.2vw, 46px); line-height: 1.05; letter-spacing: -.02em; }
+.section__head h2 { font-family: var(--font-display); font-weight: 400; font-size: calc(clamp(26px, 3.2vw, 46px) * var(--dk)); line-height: 1.05; letter-spacing: var(--dls); }
 .section__head p { color: var(--ink-soft); max-width: 46ch; font-size: 16px; line-height: 1.5; margin-bottom: .2em; }
 @media (max-width: 760px) { .section__head { grid-template-columns: 1fr; } .section__head p { margin-bottom: 0; } }
 
@@ -391,7 +396,7 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
   .cards .card:hover { border-color: #3a3a46; }
 }
 .card__top { display: flex; justify-content: space-between; font: 300 13px/1 var(--font-mono); color: #8b8d8a; text-transform: uppercase; letter-spacing: .04em; }
-.card h3 { padding-top: 56px; font-family: var(--font-display); font-weight: 300; font-size: clamp(48px, 6.4vw, 104px); letter-spacing: -.035em; line-height: .95; }
+.card h3 { padding-top: 56px; font-family: var(--font-display); font-weight: 300; font-size: calc(clamp(48px, 6.4vw, 104px) * var(--dk)); letter-spacing: var(--dls); line-height: .95; }
 .card__for { margin-top: 14px; font-size: 15px; color: #a9aba8; max-width: 30ch; }
 .card__chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
 .card__chips span { font: 300 12px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .03em; border: 1px solid #444; border-radius: 99px; padding: 8px 11px; color: #d7d8d6; }
@@ -464,7 +469,7 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
 /* ---------- about ---------- */
 .about { display: grid; grid-template-columns: 1.25fr 1fr; gap: 48px; }
 .about__left { display: grid; gap: 40px; align-content: start; }
-.about__big { font-family: var(--font-display); font-weight: 300; font-size: clamp(30px, 4.6vw, 66px); line-height: 1.08; letter-spacing: -.02em; }
+.about__big { font-family: var(--font-display); font-weight: 300; font-size: calc(clamp(30px, 4.6vw, 66px) * var(--dk)); line-height: 1.08; letter-spacing: var(--dls); }
 /* «ценное» carries the magpie-feather sheen, the site's only colour (assets/about.js moves it); «заметным» is underlined by hand */
 .shine { background: linear-gradient(100deg, var(--ink) 0 26%, #3d8f86 36%, #5FD3C4 42%, #6A7CFF 50%, #B48CFF 57%, var(--ink) 68% 100%); background-size: 260% 100%; background-position: 38% 0; -webkit-background-clip: text; background-clip: text; color: transparent; }
 .uline { position: relative; white-space: nowrap; }
@@ -476,7 +481,7 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
 .about__text p { font-size: 17px; }
 .about__facts { margin-top: 12px; display: grid; grid-template-columns: repeat(3, auto); gap: 24px; justify-content: start; }
 .about__facts div { font-size: 14px; color: var(--ink-soft); }
-.about__facts strong { display: block; font-family: var(--font-display); font-weight: 300; font-size: clamp(26px, 3vw, 40px); color: var(--ink); letter-spacing: -.02em; line-height: 1.1; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+.about__facts strong { display: block; font-family: var(--font-display); font-weight: 300; font-size: calc(clamp(26px, 3vw, 40px) * var(--dk)); color: var(--ink); letter-spacing: var(--dls); line-height: 1.1; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
 @media (max-width: 760px) { .about { grid-template-columns: 1fr; gap: 28px; } }
 
 /* ---------- contact ---------- */
@@ -492,10 +497,10 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
 @keyframes drift1 { to { transform: translate(18vw, 14vh) scale(1.15) } }
 @keyframes drift2 { to { transform: translate(-16vw, -10vh) scale(.9) } }
 @keyframes drift3 { to { transform: translate(-10vw, -18vh) scale(1.2) } }
-.contact h2 { font-family: var(--font-display); font-weight: 300; font-size: clamp(30px, 5vw, 72px); letter-spacing: -.025em; line-height: 1.05; max-width: 14ch; }
+.contact h2 { font-family: var(--font-display); font-weight: 300; font-size: calc(clamp(30px, 5vw, 72px) * var(--dk)); letter-spacing: var(--dls); line-height: 1.05; max-width: 14ch; }
 .contact p { margin-top: 24px; max-width: 50ch; color: #C4C6C3; }
 .mail { margin-top: clamp(32px, 5vw, 64px); display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-.mail a { font-family: var(--font-display); font-weight: 300; font-size: clamp(20px, 3.4vw, 48px); letter-spacing: -.02em; border-bottom: 1px solid #5A5C5B; padding-bottom: 6px; transition: border-color .3s; word-break: break-all; }
+.mail a { font-family: var(--font-display); font-weight: 300; font-size: calc(clamp(20px, 3.4vw, 48px) * var(--dk)); letter-spacing: var(--dls); border-bottom: 1px solid #5A5C5B; padding-bottom: 6px; transition: border-color .3s; word-break: break-all; }
 .mail a:hover { border-color: var(--white); }
 .mail button { font-size: 13px; color: #C4C6C3; border: 1px solid #5A5C5B; padding: 10px 16px; border-radius: 999px; transition: all .3s; }
 .mail button:hover { color: var(--ink); background: var(--white); border-color: var(--white); }
@@ -504,11 +509,13 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
 .chat__btn svg { width: 20px; height: 20px; flex: none; }
 .chat__btn:hover { color: var(--ink); background: var(--white); border-color: var(--white); }
 .foot { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: clamp(48px, 7vw, 120px); padding-top: 24px; border-top: 1px solid #3A3C3B; font-size: 13px; color: #9A9C99; }
+.foot__credit { flex: 1 1 auto; text-align: center; } .foot__credit a { white-space: nowrap; border-bottom: 1px solid #3A3C3B; transition: color .2s, border-color .2s; } .foot__credit a:hover { color: var(--white); border-color: currentColor; }
+@media (max-width: 760px) { .foot__credit { order: 3; flex-basis: 100%; text-align: left; } }
 .foot__top { color: inherit; transition: color .2s; } .foot__top:hover { color: var(--white); }
 
 /* ---------- case pages ---------- */
 .case-hero { padding-block: clamp(40px, 7vw, 96px) clamp(24px, 4vw, 48px); display: grid; grid-template-columns: 2fr 1fr; gap: 32px; align-items: end; }
-.case-hero h1 { font-family: var(--font-display); font-weight: 300; font-size: clamp(36px, 6vw, 96px); letter-spacing: -.025em; line-height: 1.02; }
+.case-hero h1 { font-family: var(--font-display); font-weight: 300; font-size: calc(clamp(36px, 6vw, 96px) * var(--dk)); letter-spacing: var(--dls); line-height: 1.02; }
 .case-hero h1 .l { display: block; overflow: hidden; padding-bottom: .08em; margin-bottom: -.08em; }
 .case-hero h1 .l > span { display: block; animation: lineUp 1.1s var(--ease) both; }
 .case-hero .ar { display: block; font-family: var(--font-body); font-weight: 400; font-size: .5em; color: var(--ink-soft); margin-top: .3em; letter-spacing: 0; animation: fadeIn .8s .4s both; }
@@ -527,7 +534,7 @@ body.intro-wait .hero__title .l > span { animation-play-state: paused; }
 .case-grid .full { grid-column: 1 / -1; }
 .case-next { border-top: 1px solid var(--line); padding-block: clamp(40px, 6vw, 80px); display: flex; justify-content: space-between; align-items: baseline; gap: 24px; flex-wrap: wrap; }
 .case-next span { font-size: 14px; color: var(--ink-soft); }
-.case-next a { font-family: var(--font-display); font-weight: 300; font-size: clamp(26px, 4vw, 56px); letter-spacing: -.02em; border-bottom: 1px solid var(--line); transition: border-color .3s, letter-spacing .5s var(--ease); }
+.case-next a { font-family: var(--font-display); font-weight: 300; font-size: calc(clamp(26px, 4vw, 56px) * var(--dk)); letter-spacing: var(--dls); border-bottom: 1px solid var(--line); transition: border-color .3s, letter-spacing .5s var(--ease); }
 .case-next a:hover { border-color: var(--ink); letter-spacing: 0; }
 @media (max-width: 760px) {
   .case-hero, .case-text { grid-template-columns: 1fr; }

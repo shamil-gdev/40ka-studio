@@ -18,6 +18,7 @@ TR = {
     'нажмите, чтобы пропустить': 'tap to skip',
     'Работы': 'Work', 'Услуги': 'Services', 'О студии': 'About', 'Контакт': 'Contact',
     'Наверх ↑': 'Back to top ↑',
+    'Шрифт заголовков —': 'Headings set in', ', Дмитрий Антонов,': ' by Dimitri Antonov,',
     '40ka — на главную': '40ka — home', 'Разделы': 'Sections', 'Меню': 'Menu',
     'Смотреть': 'View', 'Написать': 'Write', 'Скопировать': 'Copy', 'Мессенджеры': 'Messengers',
     'Расскажите о задаче.': 'Tell us about your project.',
