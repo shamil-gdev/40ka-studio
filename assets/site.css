@@ -115,7 +115,9 @@ body.intro-done .bird--hero .mp-leaves, body.intro-done.bird-ready .bird--hero .
   font-family: var(--font-logo); font-weight: 400; font-size: 27px; letter-spacing: -.02em; line-height: 1;
   display: flex; align-items: center; height: 40px;
 }
-.mark__text { order: 2; }
+.mark__text { order: 2; display: block; }
+/* the drawn wordmark (img/logo-40ka.svg): sized in em so it follows the bar's type size; takes the bar's colour */
+.mark__word { display: block; height: .907em; width: 2.926em; overflow: visible; }
 .mark__bird { pointer-events: none; order: 1; width: 0; margin-right: 0; opacity: 0; transform: translateX(-10px); transition: width .6s var(--ease), margin .6s var(--ease), opacity .4s, transform .6s var(--ease); }
 body.scrolled .mark__bird { width: 84px; margin-right: 12px; opacity: 1; transform: none; }
 /* with the flight on, the logo slot opens when the magpie flies in (assets/flight.js) */
