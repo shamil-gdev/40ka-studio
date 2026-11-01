@@ -11,7 +11,7 @@ The English pages are plain static files: they add nothing to the weight of the 
 """
 import os, re, sys, glob
 
-BASE = 'https://shamil-gdev.github.io/40ka-studio/'
+BASE = 'https://40ka.studio/'
 
 TR = {
     # ---------- shared: header, menu, contact ----------
